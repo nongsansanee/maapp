@@ -7,7 +7,7 @@ export default defineConfigWithVueTs(
     vue.configs['flat/essential'],
     vueTsConfigs.recommended,
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'vite.config.ts', 'resources/js/components/ui/*'],
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'vite.config.js', 'resources/js/components/ui/*'],
     },
     {
         plugins: {
@@ -23,7 +23,17 @@ export default defineConfigWithVueTs(
         },
         rules: {
             'vue/multi-word-component-names': 'off',
-            '@typescript-eslint/no-explicit-any': 'off',
+
+            // 1. ปิดการบังคับใส่ lang="ts" ใน <script>
+            'vue/block-lang': 'off',
+
+            // 2. ปิดการแจ้งเตือนตัวแปรที่ประกาศแล้วไม่ได้ใช้ (สำหรับ JS และ TS)
+            'no-unused-vars': 'off',
+            '@typescript-eslint/no-unused-vars': 'off',
+
+            // ----------------------------------------------
+
+
             '@typescript-eslint/consistent-type-imports': [
                 'error',
                 {

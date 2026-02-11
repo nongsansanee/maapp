@@ -23,6 +23,16 @@ const mainNavItems: NavItem[] = [
         href: dashboard(),
         icon: LayoutGrid,
     },
+    // {
+    //     title: 'ข้อมูลรายชื่อระบบ',
+    //     href: dashboard(),
+    //     icon: LayoutGrid,
+    // },
+    // {
+    //     title: 'ข้อมูลการบำรุงรักษาระบบ',
+    //     href: dashboard(),
+    //     icon: LayoutGrid,
+    // },
 ];
 
 const footerNavItems: NavItem[] = [
@@ -55,6 +65,8 @@ const footerNavItems: NavItem[] = [
 
         <SidebarContent>
             <NavMain :items="mainNavItems" />
+            <Link :href="route('application.create')"> ข้อมูลรายชื่อระบบ </Link>
+            <Link> ข้อมูลการบำรุงรักษาระบบ </Link>
         </SidebarContent>
 
         <SidebarFooter>

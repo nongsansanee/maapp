@@ -12,4 +12,15 @@ class Application extends Model
         'status',
         'application_admin'
     ];
+
+    public function scopeStatusName(): string
+    {
+        $status = $this->status;
+        if($status == 1)
+            $data='เปิดใช้งาน';
+        else
+            $data='ปิดใช้งาน';
+
+        return $data;
+    }
 }
