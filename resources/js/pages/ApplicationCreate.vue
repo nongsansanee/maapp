@@ -1,11 +1,13 @@
 <script setup>
 import { Head, useForm, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
+
 const form = useForm({
     name_th: null,
     name_en: null,
     status: 1,
     application_admin: null,
-   // status_select: 1,
+    // status_select: 1,
 
     // application_id: '',
     // application_name_th: '',
@@ -15,7 +17,9 @@ const props = defineProps({
 });
 const page = usePage();
 const user = page.props.auth.user;
+
 const addApplication = () => {
+  //  console.log('hi');
     form.post(route('application.store'), {
         onSuccess: () => {
             form.reset();
@@ -23,54 +27,29 @@ const addApplication = () => {
         },
         onError: () => {
             console.log('พบข้อผิดพลาด');
-        }
+        },
     });
 };
 </script>
 <template>
+    {{ page.props.flash.msg }}
 
-<!--    {{ props.applications }}-->
+    <!--    {{ props.applications }}-->
     <div class="bg-amber-900 text-white">สวัสดี : {{ user.name }}</div>
+
+
+
+
+
     <div class="m-6 space-y-2 bg-amber-50 p-6">
         <div class="flex w-full justify-center text-2xl">เพิ่มข้อมูลระบบ</div>
+
+        <div v-if="Object.keys(page.props.errors).length>0">
+            <li v-for="(error,index) in page.props.errors" :key="index">
+                {{error}}
+            </li>
+        </div>
         <div class="">
-<!--            <div>-->
-<!--                <label-->
-<!--                    for="country"-->
-<!--                    class="block text-sm/6 font-medium font-semibold text-gray-900"-->
-<!--                    >ชื่อระบบ</label-->
-<!--                >-->
-<!--                <div class="mt-2 grid grid-cols-1">-->
-<!--                    <select-->
-<!--                        v-model="form.application_id"-->
-<!--                        autocomplete="country-name"-->
-<!--                        class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"-->
-<!--                    >-->
-<!--                        <option value="1">&#45;&#45;กรุณาเลือก&#45;&#45;</option>-->
-<!--                        <option-->
-<!--                            v-for="application in props.applications"-->
-<!--                            :key="application.id"-->
-<!--                            :value="application.id"-->
-<!--                        >-->
-<!--                            {{ application.name_th }}-->
-<!--                        </option>-->
-<!--                    </select>-->
-<!--                    <svg-->
-<!--                        viewBox="0 0 16 16"-->
-<!--                        fill="currentColor"-->
-<!--                        data-slot="icon"-->
-<!--                        aria-hidden="true"-->
-<!--                        class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"-->
-<!--                    >-->
-<!--                        <path-->
-<!--                            d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"-->
-<!--                            clip-rule="evenodd"-->
-<!--                            fill-rule="evenodd"-->
-<!--                        />-->
-<!--                    </svg>-->
-<!--                </div>-->
-<!--                {{form.application_id}}-->
-<!--            </div>-->
             <label
                 for="username"
                 class="mt-2 block text-sm/6 font-bold text-gray-900"
@@ -116,7 +95,7 @@ const addApplication = () => {
         <div class="mt-4">
             <fieldset>
                 <legend class="text-sm/6 font-semibold text-gray-900">
-                    สถานะการใช้งาน Sample1
+                    สถานะการใช้งาน
                 </legend>
                 <div class="mt-2 space-y-2">
                     <div class="flex items-center gap-x-3">
@@ -160,8 +139,6 @@ const addApplication = () => {
             </fieldset>
         </div>
 
-
-
         <div class="">
             <label
                 for="username"
@@ -174,8 +151,8 @@ const addApplication = () => {
                     class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600"
                 >
                     <input
+                        v-model="form.application_admin"
                         type="text"
-                        name="application_admin"
                         placeholder="คุณทดสอบ,คุณระบบ....."
                         class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
                     />
@@ -187,8 +164,8 @@ const addApplication = () => {
                 Cancel
             </button>
             <button
-                type="button"
                 @click="addApplication"
+                type="button"
                 class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
                 Save

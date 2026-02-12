@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -31,11 +33,18 @@ class ApplicationController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreApplicationRequest $request) : RedirectResponse
     {
-        dd($request->all());
+
+
+     //     dd($request->all());
+
+       // dd($request->all());
+      //  return back()->with(["intent" => "danger", "msg" => "เพิ่มข้อมูลไม่สำเร็จ"]);
         return back()->with(["intent" => "success", "msg" => "เพิ่มข้อมูลเรียบร้อย"]);
     }
+
+
 
     /**
      * Display the specified resource.
