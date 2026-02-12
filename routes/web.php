@@ -18,11 +18,15 @@ Route::get('dashboard', function () {
 //Route::get('/application/index', [ApplicationController::class, 'index'])
 //    ->name('application.index');
 
-Route::get('/application/create',  function () {
-    return Inertia::render('ApplicationCreate');
-})->name('application.create');
+//Route::get('/application/create',  function () {
+//    return Inertia::render('ApplicationCreate');
+//})->name('application.create');
 
-Route::post('/application/store', [ApplicationController::class, 'store'])->name('application.store');
+Route::get('/application/create', [ApplicationController::class, 'create'])
+    ->middleware(['auth', 'verified'])->name('application.create');
+
+Route::post('/application/store', [ApplicationController::class, 'store'])
+    ->name('application.store');
 
 
 require __DIR__.'/settings.php';

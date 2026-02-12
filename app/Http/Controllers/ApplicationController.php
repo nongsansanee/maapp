@@ -23,7 +23,9 @@ class ApplicationController extends Controller
      */
     public function create()
     {
-        //
+        $applications = Application::where('status', 1)->get();
+        return Inertia::render('ApplicationCreate',
+            ['applications'=>$applications]);
     }
 
     /**
@@ -31,7 +33,7 @@ class ApplicationController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request);
+        dd($request->all());
         return back()->with(["intent" => "success", "msg" => "เพิ่มข้อมูลเรียบร้อย"]);
     }
 
