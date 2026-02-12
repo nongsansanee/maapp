@@ -25,5 +25,5 @@ Route::get('/application/create',  function () {
 Route::post('/application/store', [ApplicationController::class, 'store'])->name('application.store');
 
 
-require __DIR__.'/settings.php';
-require __DIR__.'/ma_app.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/ma_app.php';
