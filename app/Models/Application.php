@@ -13,6 +13,11 @@ class Application extends Model
         'application_admin'
     ];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function scopeStatusName(): string
     {
         $status = $this->status;

@@ -16,7 +16,22 @@ class ApplicationController extends Controller
     public function index()
     {
         $applications = Application::all();
-        return Inertia::render('Application', compact('applications'));
+        return Inertia::render('ApplicationIndex', compact('applications'));
+
+
+
+
+        $requests = Request::query()
+            ->get()
+            ->map( function($request) {
+                return [
+                    'id' => $request->id,
+                    'user_id' => $request->user_id,
+                    'user_name' => $request->user->name,
+
+                ];
+            });
+
 
     }
 
@@ -35,12 +50,12 @@ class ApplicationController extends Controller
      */
     public function store(StoreApplicationRequest $request) : RedirectResponse
     {
+        try{
+            $application = Application::query()->create($request->validated());
+        }catch (\Exception $exception){
+            return back()->with(["intent" => "danger", "msg" => "เพิ่มข้อมูลไม่สำเร็จ เนื่องจาก {$exception->getMessage()}"]);
+        }
 
-
-     //     dd($request->all());
-
-       // dd($request->all());
-      //  return back()->with(["intent" => "danger", "msg" => "เพิ่มข้อมูลไม่สำเร็จ"]);
         return back()->with(["intent" => "success", "msg" => "เพิ่มข้อมูลเรียบร้อย"]);
     }
 
@@ -57,9 +72,16 @@ class ApplicationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+//    public function edit(string $id)
+//    {
+//        //dd($id);
+//        $application = Application::query()->find($id);
+//        return Inertia::render('ApplicationEdit',['application'=>$application]);
+//    }
+
+    public function edit(Application $application)
     {
-        //
+        return Inertia::render('ApplicationEdit',['application'=>$application]);
     }
 
     /**

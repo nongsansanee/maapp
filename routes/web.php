@@ -15,8 +15,8 @@ Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-//Route::get('/application/index', [ApplicationController::class, 'index'])
-//    ->name('application.index');
+Route::get('/application/index', [ApplicationController::class, 'index'])
+    ->middleware(['auth', 'verified'])->name('application.index');
 
 //Route::get('/application/create',  function () {
 //    return Inertia::render('ApplicationCreate');
@@ -27,6 +27,10 @@ Route::get('/application/create', [ApplicationController::class, 'create'])
 
 Route::post('/application/store', [ApplicationController::class, 'store'])
     ->name('application.store');
+
+
+Route::get('/application/{application}/edit', [ApplicationController::class, 'edit'])
+    ->middleware(['auth', 'verified'])->name('application.edit');
 
 
 require __DIR__.'/settings.php';

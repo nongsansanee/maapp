@@ -1,80 +1,45 @@
 <script setup>
-import { Head, router, useForm, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { router, useForm, usePage } from '@inertiajs/vue3';
 
-const form = useForm({
-    name_th: null,
-    name_en: null,
-    status: 1,
-    application_admin: null,
-    // status_select: 1,
-
-    // application_id: '',
-    // application_name_th: '',
-});
 const props = defineProps({
-    applications: Array,
+    application: { type:Object },
 });
+const form = useForm({
+    name_th:  props.application.name_th,
+    name_en:  '',
+    status: 1 ,
+    application_admin:  '',
+});
+
 const page = usePage();
 const user = page.props.auth.user;
-const ModalAlert =ref(false);
-const closeAlert=()=>{
-    ModalAlert.value = false
-    router.get(route('application.index'), {}, {
-        preserveState: true,
-        preserveScroll: true,
-        onSuccess: () => {},
-        onError: () => {},
-        onFinish: () => { },
-    })
-}
+
 const addApplication = () => {
-  //  console.log('hi');
+    //  console.log('hi');
     form.post(route('application.store'), {
         onSuccess: () => {
             form.reset();
-         //   alert('บันทึกข้อมูลเรียบร้อย!');
-            ModalAlert.value = true
+            alert('บันทึกข้อมูลเรียบร้อย!');
         },
         onError: () => {
             console.log('พบข้อผิดพลาด');
         },
     });
 };
+
+
 </script>
 <template>
-<!--    {{ page.props.flash.msg }}-->
+    {{ page.props.flash.msg }}
 
     <!--    {{ props.applications }}-->
     <div class="bg-amber-900 text-white">สวัสดี : {{ user.name }}</div>
 
-
-    <div  v-if="ModalAlert"
-          class=" m-2 p-2 bg-gray-50 border-2 border-red-300 w-flull flex justify-center rounded-lg">
-        <div>
-            <label v-if="usePage().props.flash.msg" :intent="usePage().props.flash.intent" >
-                {{ usePage().props.flash.msg }}
-            </label>
-        </div>
-        <div
-            class="ml-4 px-2 text-red-600 bg-red-200 rounded-lg hover:cursor-pointer"
-            @click="closeAlert"
-        >
-            close
-        </div>
-
-    </div>
-
-
+    {{ props.application }}
 
     <div class="m-6 space-y-2 bg-amber-50 p-6">
-        <div class="flex w-full justify-center text-2xl">เพิ่มข้อมูลระบบ</div>
+        <div class="flex w-full justify-center text-2xl">แก้ไขข้อมูลระบบ</div>
 
-<!--        <div v-if="Object.keys(page.props.errors).length>0">-->
-<!--            <li v-for="(error,index) in page.props.errors" :key="index">-->
-<!--                {{error}}-->
-<!--            </li>-->
-<!--        </div>-->
         <div class="">
             <label
                 for="username"
@@ -95,13 +60,11 @@ const addApplication = () => {
                     />
                 </div>
 
-                <div v-if="usePage().props.errors.name_th"
-                     class ="text-red-600"
-                    >
-                    {{usePage().props.errors.name_th}}
+                <div v-if="usePage().props.errors.name_th" class="text-red-600">
+                    {{ usePage().props.errors.name_th }}
                 </div>
             </div>
-            <label for="">{{ form.name_th }}</label>
+
         </div>
         <div class="">
             <label
@@ -122,10 +85,8 @@ const addApplication = () => {
                         class="block min-w-0 grow bg-white py-1.5 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6"
                     />
                 </div>
-                <div v-if="usePage().props.errors.name_en"
-                     class ="text-red-600"
-                 >
-                    {{usePage().props.errors.name_en}}
+                <div v-if="usePage().props.errors.name_en" class="text-red-600">
+                    {{ usePage().props.errors.name_en }}
                 </div>
             </div>
         </div>
@@ -153,7 +114,7 @@ const addApplication = () => {
                         <input
                             v-model="form.status"
                             type="radio"
-                            value="2"
+                            value="0"
                             class="relative size-4 appearance-none rounded-full border border-gray-300 bg-white before:absolute before:inset-1 before:rounded-full before:bg-white not-checked:before:hidden checked:border-indigo-600 checked:bg-indigo-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:border-gray-300 disabled:bg-gray-100 disabled:before:bg-gray-400 forced-colors:appearance-auto forced-colors:before:hidden"
                         />
                         <label
@@ -195,14 +156,18 @@ const addApplication = () => {
                     />
                 </div>
             </div>
-            <div  v-if="usePage().props.errors.application_admin"
-                class ="text-red-600"
-                 >
-                {{usePage().props.errors.application_admin}}
+            <div
+                v-if="usePage().props.errors.application_admin"
+                class="text-red-600"
+            >
+                {{ usePage().props.errors.application_admin }}
             </div>
         </div>
         <div class="mt-6 flex items-center justify-end gap-x-6">
-            <button type="button" class="text-sm/6 font-semibold text-gray-900">
+            <button
+                @click="back"
+                    type="button"
+                    class="text-sm/6 font-semibold text-gray-900">
                 Cancel
             </button>
             <button

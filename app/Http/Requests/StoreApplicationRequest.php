@@ -22,7 +22,7 @@ class StoreApplicationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name_th' => 'required|max:5',
+            'name_th' => 'required|max:50',
             'name_en' => 'required',
             'status' => 'required',
             'application_admin' => 'required',
@@ -33,7 +33,7 @@ class StoreApplicationRequest extends FormRequest
     {
         return [
             'name_th.required' => 'กรุณาระบุชื่อระบบ(ภาษาไทย)',
-            'name_th.max' => 'กรุณาระบุชื่อระบบ(ภาษาไทย) ไม่เกิน 5 ตัวอักษร',
+            'name_th.max' => 'กรุณาระบุชื่อระบบ(ภาษาไทย) ไม่เกิน 50 ตัวอักษร',
         ];
     }
 }
