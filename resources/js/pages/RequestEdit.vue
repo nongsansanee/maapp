@@ -2,53 +2,33 @@
 import { useForm , usePage } from '@inertiajs/vue3';
 
 const page = usePage();
-const request = page.props.request;
-request.date_request = request.date_request.split(' ')[0];
-if(request.type_request === 'bug') {
-    request.type_request = {type: 'Bug', value: 'bug'};
-} else if (request.type_request === 'new_feature') {
-    request.type_request = {type: 'New Feature', value: 'new_feature'};
-} else if (request.type_request === 'improvement') {
-    request.type_request = {type: 'Improvement', value: 'improvement'};
-}
-console.log('Page props request type:', request.type_request);
-console.log('Request to edit:', request);
-
-if(request.status_request === 'pending') {
-    request.status_request = {status: 'Pending', value: 'pending'};
-} else if (request.status_request === 'in_progress') {
-    request.status_request = {status: 'In Progress', value: 'in_progress'};
-} else if (request.status_request === 'completed') {
-    request.status_request = {status: 'Completed', value: 'completed'};
-} else if (request.status_request === 'rejected') {
-    request.status_request = {status: 'Rejected', value: 'rejected'};
-} else if (request.status_request === 'testing') {
-    request.status_request = {status: 'Testing', value: 'testing'};
-} else if (request.status_request === 'approved') {
-    request.status_request = {status: 'Approved', value: 'approved'};
-}
-
-const type_request = page.props.type_request;
-const status_request = page.props.status_request;
+// console.log('request first:', request);
+// const type_request = page.props.type_request;
+// const status_request = page.props.status_request;
 const props = defineProps({
-    applications: Array
+    applications: Array,
+    type_request: Array,
+    status_request: Array,
+    request: Object
 });
 
+// const request = page.props.request;
 const form = useForm({
-    user_id: request.user_id,
-    actor: request.actor,
-    requester: request.requester,
-    date_request: request.date_request,
-    type_request: request.type_request,
-    description: request.description,
-    status_request: request.status_request ,
-    application: request.application_id
+    user_id: props.request.user_id,
+    actor: props.request.actor,
+    requester: props.request.requester,
+    date_request: props.request.date_request,
+    type_request: props.request.type_request,
+    description: props.request.description,
+    status_request: props.request.status_request,
+    application: props.request.application_id
 })
 
-const EditRequest = () => {
+const EditRequest = (Apprequest) => {
     form.type_request = form.type_request.value;
     form.status_request = form.status_request.value;
-    form.put(route('request.update', request.id), {
+    console.log('request', Apprequest , 'form',form);
+    form.patch(route('request.update', Apprequest), {
         onSuccess: () => {
             alert('Request updated successfully');
             form.reset();
@@ -61,7 +41,7 @@ const EditRequest = () => {
 
 </script>
 <template>
-    <div class=" bg-black w-full h-screen flex flex-col">
+    <div class=" bg-gray-900 w-full h-screen flex flex-col">
         <nav class=" w-full flex justify-between items-center bg-gray-700 p-6 h-24">
             <h1 class=" text-white text-2xl font-bold">Welcome to MA Application Edit Request Page</h1>
             <div>
@@ -75,11 +55,6 @@ const EditRequest = () => {
                 <h2 class=" text-black text-3xl font-bold mt-10 text-center">MA Application Edit Request Page</h2>
                 <p class=" text-black mt-6 w-3/4 text-center">If you want to edit an existing application request, please update the details in the input
                     field below.</p>
-            
-                <!-- <p class="text-black">{{ user.name }} </p> -->
-                <!-- <p class="text-black">{{ form.applications }} </p> -->
-                <!-- <p class="text-black">{{ props.applications.name_th }}</p> -->
-                <!-- <p class="text-black">{{ form.errors }}</p> -->
                 <div class=" w-4/5 h-1/2 flex flex-col items-center mt-2 gap-2 opacity-100 transition-all duration-750 starting:translate-y-6 starting:opacity-0">
                     <div class=" flex flex-col w-full gap-2">
                         <label for="actor" class=" text-black mt-6">Actor: {{ form.actor }}</label>
@@ -140,15 +115,12 @@ const EditRequest = () => {
                     </div>
 
 
-                    <button type="submit" @click="EditRequest(form)"
+                    <button type="submit" @click="EditRequest(props.request)"
                         class=" mt-6 mb-12 bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600">Edit
                         Request</button>
-
-                    <!-- <div v-if="request_success" class="mt-4 p-4 bg-green-100 text-green-700 rounded-lg">
-                        {{ request_success }}
-                    </div> -->
                 </div>
             </div>
+            
         </div>
     </div>
 

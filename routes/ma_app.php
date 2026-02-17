@@ -16,4 +16,8 @@ Route::post('/request/store', [RequestController::class, 'store'])->name('reques
 
 Route::get('/request/edit/{request}', [RequestController::class, 'edit'])->name('request.edit');
 
-Route::put('/request/update/{request_id}', [RequestController::class, 'update'])->name('request.update');
+Route::patch('/request/update/{Apprequest}', [RequestController::class, 'update'])->name('request.update');
+
+Route::put('/request/update_status/{request}', [RequestController::class, 'update_status'])->name('request.update_status');
+
+Route::get('/request/show/{request}', [RequestController::class, 'show'])->name('request.show');
