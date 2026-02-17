@@ -18,21 +18,6 @@ class ApplicationController extends Controller
         $applications = Application::all();
         return Inertia::render('ApplicationIndex', compact('applications'));
 
-
-
-
-        $requests = Request::query()
-            ->get()
-            ->map( function($request) {
-                return [
-                    'id' => $request->id,
-                    'user_id' => $request->user_id,
-                    'user_name' => $request->user->name,
-
-                ];
-            });
-
-
     }
 
     /**
@@ -87,16 +72,44 @@ class ApplicationController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Application $application)
     {
-        //
+        $validated = $request->validate([
+            'name_th' => 'required|max:50',
+            'name_en' => 'required',
+            'status' => 'required',
+            'application_admin' => 'required',
+        ]);
+        $application->fill($validated);
+
+        if ($application->isClean()) {
+            return back()->with([
+                'intent' => 'warning',
+                'msg' => 'ไม่มีการแก้ไขข้อมูล'
+            ]);
+        }
+        $application->save();
+
+        return back()->with([
+            'intent' => 'success',
+            'msg' => 'แก้ไขข้อมูลเรียบร้อยแล้ว'
+        ]);
+       // dd($request->all());
+       // dd($application);
+//        dd($request);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Application $application)
     {
-        //
+      // dd($application);
+        $application->delete();
+
+        return back()->with([
+            'intent' => 'success',
+            'msg' => 'ลบข้อมูลเรียบร้อยแล้ว'
+        ]);
     }
 }

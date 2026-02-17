@@ -5,38 +5,56 @@ const props = defineProps({
     application: { type:Object },
 });
 const form = useForm({
+    id : props.application.id,
     name_th:  props.application.name_th,
-    name_en:  '',
-    status: 1 ,
-    application_admin:  '',
+    name_en:  props.application.name_en,
+    status: props.application.status ,
+    application_admin:  props.application.application_admin,
 });
 
 const page = usePage();
 const user = page.props.auth.user;
 
-const addApplication = () => {
-    //  console.log('hi');
-    form.post(route('application.store'), {
+const updateApplication = (application) => {
+  //  console.log('updateApplication');
+    // console.log(application);
+
+    form.patch(route('application.update',props.application), {
         onSuccess: () => {
-            form.reset();
-            alert('บันทึกข้อมูลเรียบร้อย!');
+            console.log('update success')
+            //   alert('บันทึกข้อมูลเรียบร้อย!');
+           // ModalAlert.value = true
         },
         onError: () => {
             console.log('พบข้อผิดพลาด');
         },
     });
+
 };
 
+const back=()=>{
 
+    router.get(route('application.index'), {}, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => {},
+        onError: () => {},
+        onFinish: () => { },
+    })
+}
 </script>
 <template>
-    {{ page.props.flash.msg }}
+
 
     <!--    {{ props.applications }}-->
     <div class="bg-amber-900 text-white">สวัสดี : {{ user.name }}</div>
-
-    {{ props.application }}
-
+<!--    {{ page.props.flash.msg }}-->
+<!--    {{ props.application }}-->
+    <div class="w-full flex justify-center bg-red-200 my-2">
+        <label v-if="usePage().props.flash.msg" :intent="usePage().props.flash.intent" >
+            {{ usePage().props.flash.msg }}
+        </label>
+    </div>
     <div class="m-6 space-y-2 bg-amber-50 p-6">
         <div class="flex w-full justify-center text-2xl">แก้ไขข้อมูลระบบ</div>
 
@@ -168,14 +186,14 @@ const addApplication = () => {
                 @click="back"
                     type="button"
                     class="text-sm/6 font-semibold text-gray-900">
-                Cancel
+                กลับหน้าหลัก
             </button>
             <button
-                @click="addApplication"
+                @click="updateApplication(props.application)"
                 type="button"
                 class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
             >
-                Save
+                แก้ไข
             </button>
         </div>
     </div>

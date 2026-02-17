@@ -8,8 +8,7 @@ const props = defineProps({
 })
 
 const editApplication = (application) =>{
-    console.log(application)
-
+  //  console.log(application)
     router.get(route('application.edit', application), {}, {
         preserveState: true,
         preserveScroll: true,
@@ -20,12 +19,18 @@ const editApplication = (application) =>{
 
 }
 
+
+
 </script>
 <template>
     <div class="w-full flex justify-center text-4xl p-4" >
         <label> รายชื่อระบบสารสนเทศของภาควิชาอายุรศาสตร์ </label>
     </div>
-
+    <div class="w-full flex justify-center bg-red-200 my-2">
+        <label v-if="usePage().props.flash.msg" :intent="usePage().props.flash.intent" >
+            {{ usePage().props.flash.msg }}
+        </label>
+    </div>
     <div class="mt-6 mx-4 flex items-center ">
         <Link :href="route('application.create')">
             <button
@@ -108,7 +113,7 @@ const editApplication = (application) =>{
                 <td  class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">
                     {{ app.application_admin }}
                 </td>
-                <td  class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">
+                <td  class="px-3 py-2 font-medium  whitespace-nowrap">
                     <button
                         @click="editApplication(app)"
                         type="button"
@@ -116,7 +121,12 @@ const editApplication = (application) =>{
                     >
                     edit
                     </button>
-
+                    <button
+                        type="button"
+                        class=" mx-2 rounded-md bg-red-700 text-white px-3 py-2 text-sm font-semibold  shadow-xs hover:bg-red-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                    >
+                        delete
+                    </button>
                 </td>
             </tr>
             </thead>
