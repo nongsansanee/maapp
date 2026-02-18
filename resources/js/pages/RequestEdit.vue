@@ -1,36 +1,53 @@
 <script setup>
 import { useForm , usePage } from '@inertiajs/vue3';
 
+
 const page = usePage();
-// console.log('request first:', request);
 // const type_request = page.props.type_request;
 // const status_request = page.props.status_request;
 const props = defineProps({
     applications: Array,
     type_request: Array,
     status_request: Array,
-    request: Object
+    request: Object,
+    request_with_timeline: Object
 });
 
+console.log('request first:', props.request);
 // const request = page.props.request;
 const form = useForm({
-    user_id: props.request.user_id,
-    actor: props.request.actor,
-    requester: props.request.requester,
-    date_request: props.request.date_request,
-    type_request: props.request.type_request,
-    description: props.request.description,
-    status_request: props.request.status_request,
-    application: props.request.application_id
+    user_id: props.request_with_timeline.user_id,
+    actor: props.request_with_timeline.actor,
+    requester: props.request_with_timeline.requester,
+    date_request: props.request_with_timeline.date_request,
+    type_request: props.request_with_timeline.type_request,
+    description: props.request_with_timeline.description,
+    status_request: props.request_with_timeline.status_request,
+    application_id: props.request_with_timeline.application_id
 })
 
-const EditRequest = (Apprequest) => {
+// console.log('form:', form);
+
+const EditRequest = () => {
     form.type_request = form.type_request.value;
     form.status_request = form.status_request.value;
-    console.log('request', Apprequest , 'form',form);
-    form.patch(route('request.update', Apprequest), {
-        onSuccess: () => {
-            alert('Request updated successfully');
+//     const model_request = {
+//         user_id: App_request.user_id,
+//         requester: App_request.requester,
+//         date_request: App_request.date_request,
+//         type_request: App_request.type_request.value,
+//         description: App_request.description,
+//         application_id: App_request.application_id
+//     }
+//     const model_timeline_request = {
+//         name: App_request.actor,
+//         status_request: App_request.status_request.value,
+//     }
+    console.log('model_request', props.request , 'model_timeline_request', props.request_with_timeline,'from form', form);
+
+    form.patch(route('request.update', props.request_with_timeline), {
+        onSuccess: (res) => {
+            alert(res.props.flash.msg);
             form.reset();
         },
         onError: (errors) => {
@@ -103,15 +120,15 @@ const EditRequest = (Apprequest) => {
                     </div>
 
                     <div class=" flex flex-col w-full gap-2">
-                        <label for="application" class=" text-black mt-6"> Applications: {{ form.application }} </label>
-                        <select id="application" v-model="form.application" :class="form.errors.application && !form.application ? 'border-red-500 placeholder-red-500:' : ''"
+                        <label for="application" class=" text-black mt-6"> Applications: {{ form.application_id }} </label>
+                        <select id="application" v-model="form.application_id" :class="form.errors.application_id && !form.application_id ? 'border-red-500 placeholder-red-500:' : ''"
                             class="h-10 border border-gray-400 rounded-lg p-2 text-black placeholder-gray-400 w-full">
                             <option value="" disabled selected>Select Application</option>
                             <option v-for="application in props.applications" :key="application.id" :value="application.id">
                                 {{ application.name_th }}
                             </option>
                         </select>
-                        <p v-if="form.errors.application && !form.application" class="text-red-500">{{ form.errors.application }}</p>
+                        <p v-if="form.errors.application_id && !form.application_id" class="text-red-500">{{ form.errors.application_id }}</p>
                     </div>
 
 

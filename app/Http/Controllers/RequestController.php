@@ -136,6 +136,8 @@ class RequestController extends Controller
      */
     public function show(ModelsRequest $request)
     {
+
+        dd('request', $request);
         $request = ModelsRequest::query()
             ->where('id', $request->id)
             ->get()
@@ -180,12 +182,13 @@ class RequestController extends Controller
      */
     public function edit(ModelsRequest $request)
     {
-        $request = [
+        $request_with_timeline = [
             'id' => $request->id,
             'user_id' => $request->user_id,
             'user_name' => $request->user->name,
             'requester' => $request->requester,
             'date_request' => date('Y-m-d', strtotime($request->date_request)),
+            // 'date_request' => $request->date_request,
             'application_id' => $request->application->id,
             'application_name_th' => $request->application->name_th,
             'application_name_en' => $request->application->name_en,
@@ -226,6 +229,7 @@ class RequestController extends Controller
 
         return Inertia::render('RequestEdit', [
             'request' => $request,
+            'request_with_timeline' => $request_with_timeline,
             'type_request' => $type,
             'status_request' => $status,
             'applications' => $applications,
@@ -235,9 +239,9 @@ class RequestController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRequestRequest $request, ModelsRequest $request_model)
+    public function update(Request $update_request, ModelsRequest $model_request)
+    // public function update(UpdateRequestRequest $update_request, string $id)
     {
-        dd($request->all(), $request_model);
         // ModelsRequest::where('id', $id)->update([
         //     'user_id' => $request->user_id,
         //     'requester' => $request->requester,
@@ -256,23 +260,41 @@ class RequestController extends Controller
         // ]);
         // }
 
-        if ($request_model->isDirty()) {
-            $request_model->save();
+        // $request_model = ModelsRequest::find($id)
+        //     ->first();
+        // dd($update_request->all(), $update_request);
+
+        $validated = $update_request->validate([
+            'user_id' => 'required',
+            'requester' => 'required',
+            'date_request' => 'required|date',
+            'application_id' => 'required',
+            // 'type_request' => 'required',
+            'description' => 'required',
+
+        ]);
+        $validated['date_request'] = date('Y-m-d 00:00:00', strtotime($validated['date_request']));
+        $model_request->fill($validated);
+
+        if ($model_request->isClean()) {
+            return back()->with([
+                "intent" => "warning",
+                'msg' => 'No changes were made to the request!',
+            ]);
+        } else {
+            // dd($update_request->all(), $model_request);
+            // dd($validated, $model_request, $model_request->getDirty(), $model_request->isClean());
+            $model_request->save();
 
             ModelsRequest_Timeline::create([
-                'name' => $request->actor,
-                'status_request' => $request->status_request,
-                'request_id' => $request_model->id,
+                'name' => $update_request->actor,
+                'status_request' => $update_request->status_request,
+                'request_id' => $model_request->id,
             ]);
 
             return redirect()->route('request.index')->with([
                 "intent" => "success",
                 'msg' => 'Request updated successfully!',
-            ]);
-        } else {
-            return redirect()->route('request.index')->with([
-                "intent" => "warning",
-                'msg' => 'No changes were made to the request!',
             ]);
         }
     }
@@ -291,13 +313,20 @@ class RequestController extends Controller
             'request_id' => $id,
         ]);
 
-        return redirect()->route('request.index')->with([
+        return back()->with([
             "intent" => "success",
             'msg' => 'Request status updated successfully!',
         ]);
     }
     public function destroy(string $id)
     {
-        //
+        ModelsRequest::destroy($id);
+        foreach (ModelsRequest_Timeline::where('request_id', $id)->get() as $timeline) {
+            $timeline->delete();
+        }
+        return redirect()->route('request.index')->with([
+            "intent" => "success",
+            'msg' => 'Request deleted successfully!',
+        ]);
     }
 }

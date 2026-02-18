@@ -22,12 +22,13 @@ class UpdateRequestRequest extends FormRequest
      public function rules(): array
     {
         return [
-            'actor' => 'required|max:50',
+            // 'actor' => 'required|max:50',
+            'user_id' => 'required',
             'requester' => 'required|max:50',
             'date_request' => 'required',
             'application' => 'required',
             'type_request' => 'required',
-            'status_request' => 'required',
+            // 'status_request' => 'required',
             'description' => 'required|max:255',
         ];
     }
@@ -35,12 +36,12 @@ class UpdateRequestRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'actor.required' => 'กรุณากรอกชื่อผู้กระทำ',
+            // 'actor.required' => 'กรุณากรอกชื่อผู้กระทำ',
             'requester.required' => 'กรุณากรอกผู้ร้องขอ',
             'date_request.required' => 'กรุณากรอกวันที่',
             'application.required' => 'กรุณาเลือกแอปพลิเคชัน',
             'type_request.required' => 'กรุณาเลือกประเภทคำขอ',
-            'status_request.required' => 'กรุณาเลือกสถานะคำขอ',
+            // 'status_request.required' => 'กรุณาเลือกสถานะคำขอ',
             'description.required' => 'กรุณากรอกคำอธิบาย',
         ];
     }
