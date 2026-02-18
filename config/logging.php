@@ -80,6 +80,16 @@ return [
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
+            'http_client_options' => [
+                'proxy' => env('PROX_AUTH_URL'),
+                'verify' => true, // สำคัญ: ลองปิดการตรวจใบรับรองเพื่อดูว่าผ่าน Proxy ได้ไหม
+                'curl' => [
+                    CURLOPT_PROXYAUTH      => CURLAUTH_ANY, // เปลี่ยนจาก HTTPAUTH เป็น PROXYAUTH
+                    CURLOPT_HTTPPROXYTUNNEL => true,         // บังคับมุด Tunnel (เหมือนคำสั่ง curl -p)
+                    CURLOPT_SSL_VERIFYPEER  => false,       // ย้ำการปิดการตรวจใบรับรองในระดับ Curl
+                    CURLOPT_SSL_VERIFYHOST  => 0,
+                ],
+            ],
         ],
 
         'papertrail' => [

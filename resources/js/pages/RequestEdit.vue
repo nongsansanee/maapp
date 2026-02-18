@@ -28,7 +28,7 @@ const EditRequest = (Apprequest) => {
     form.type_request = form.type_request.value;
     form.status_request = form.status_request.value;
     console.log('request', Apprequest , 'form',form);
-    form.patch(route('request.update', Apprequest), {
+    form.patch(route('request.update', props.request), {
         onSuccess: () => {
             alert('Request updated successfully');
             form.reset();
@@ -58,7 +58,7 @@ const EditRequest = (Apprequest) => {
                 <div class=" w-4/5 h-1/2 flex flex-col items-center mt-2 gap-2 opacity-100 transition-all duration-750 starting:translate-y-6 starting:opacity-0">
                     <div class=" flex flex-col w-full gap-2">
                         <label for="actor" class=" text-black mt-6">Actor: {{ form.actor }}</label>
-                        <input type="text" id="actor" v-model="form.actor" placeholder="Actor" :class="form.errors.actor && !form.actor ? 'border-red-500 placeholder-red-500:' : ''" 
+                        <input type="text" id="actor" v-model="form.actor" placeholder="Actor" :class="form.errors.actor && !form.actor ? 'border-red-500 placeholder-red-500:' : ''"
                             class="h-10 border border-gray-400 rounded-lg p-2 text-black placeholder-gray-400" />
                             <p v-if="form.errors.actor && !form.actor" class="text-red-500">{{ form.errors.actor }}</p>
                     </div>
@@ -120,7 +120,7 @@ const EditRequest = (Apprequest) => {
                         Request</button>
                 </div>
             </div>
-            
+
         </div>
     </div>
 

@@ -180,33 +180,62 @@ class RequestController extends Controller
      */
     public function edit(ModelsRequest $request)
     {
-        $request = [
-            'id' => $request->id,
-            'user_id' => $request->user_id,
-            'user_name' => $request->user->name,
-            'requester' => $request->requester,
-            'date_request' => date('Y-m-d', strtotime($request->date_request)),
-            'application_id' => $request->application->id,
-            'application_name_th' => $request->application->name_th,
-            'application_name_en' => $request->application->name_en,
-            'application_admin' => $request->application->application_admin,
-            'type_request' => match ($request->type_request) {
-                'bug' => ['type' => 'Bug', 'value' => 'bug'],
-                'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
-                'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
-            },
-            'description' => $request->description,
-            'actor' => $request->RequestTimeline->last()->name ?? null,
-            'status_request' => match ($request->RequestTimeline->last()->status_request) {
-                'pending' => ['status' => 'Pending', 'value' => 'pending'],
-                'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
-                'completed' => ['status' => 'Completed', 'value' => 'completed'],
-                'rejected' => ['status' => 'Rejected', 'value' => 'rejected'],
-                'testing' => ['status' => 'Testing', 'value' => 'testing'],
-                'approved' => ['status' => 'Approved', 'value' => 'approved'],
-            },
-        ];
-
+//        $request = [
+//            'id' => $request->id,
+//            'user_id' => $request->user_id,
+//            'user_name' => $request->user->name,
+//            'requester' => $request->requester,
+//            'date_request' => date('Y-m-d', strtotime($request->date_request)),
+//            'application_id' => $request->application->id,
+//            'application_name_th' => $request->application->name_th,
+//            'application_name_en' => $request->application->name_en,
+//            'application_admin' => $request->application->application_admin,
+//            'type_request' => match ($request->type_request) {
+//                'bug' => ['type' => 'Bug', 'value' => 'bug'],
+//                'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
+//                'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
+//            },
+//            'description' => $request->description,
+//            'actor' => $request->RequestTimeline->last()->name ?? null,
+//            'status_request' => match ($request->RequestTimeline->last()->status_request) {
+//                'pending' => ['status' => 'Pending', 'value' => 'pending'],
+//                'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
+//                'completed' => ['status' => 'Completed', 'value' => 'completed'],
+//                'rejected' => ['status' => 'Rejected', 'value' => 'rejected'],
+//                'testing' => ['status' => 'Testing', 'value' => 'testing'],
+//                'approved' => ['status' => 'Approved', 'value' => 'approved'],
+//            },
+//        ];
+        $request = ModelsRequest::query()
+            ->get()
+            ->map(function ($request) {
+                return [
+                    'id' => $request->id,
+                    'user_id' => $request->user_id,
+                    'user_name' => $request->user->name,
+                    'requester' => $request->requester,
+                    'date_request' => date('d-m-Y', strtotime($request->date_request)),
+                    'application_id' => $request->application->id,
+                    'application_name_th' => $request->application->name_th,
+                    'application_name_en' => $request->application->name_en,
+                    'application_admin' => $request->application->application_admin,
+                    'type_request' => match ($request->type_request) {
+                        'bug' => ['type' => 'Bug', 'value' => 'bug'],
+                        'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
+                        'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
+                    },
+                    'description' => $request->description,
+                    'actor' => $request->RequestTimeline->last()->name ?? null,
+                    'status_request' => match ($request->RequestTimeline->last()->status_request) {
+                        'pending' => ['status' => 'Pending', 'value' => 'pending'],
+                        'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
+                        'completed' => ['status' => 'Completed', 'value' => 'completed'],
+                        'rejected' => ['status' => 'Rejected', 'value' => 'rejected'],
+                        'testing' => ['status' => 'Testing', 'value' => 'testing'],
+                        'approved' => ['status' => 'Approved', 'value' => 'approved'],
+                    },
+                ];
+            })->first();
         // dd($request);
 
         $type = [
