@@ -37,5 +37,5 @@ Route::patch('/application/{application}/update', [ApplicationController::class,
 //Route::delete('/application/{application}/destroy', [ApplicationController::class, 'destroy'])
 //    ->middleware(['auth', 'verified'])->name('application.destroy');
 
-require __DIR__.'/settings.php';
-require __DIR__.'/ma_app.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/ma_app.php';
