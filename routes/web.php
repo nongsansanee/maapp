@@ -34,8 +34,8 @@ Route::get('/application/{application}/edit', [ApplicationController::class, 'ed
 Route::patch('/application/{application}/update', [ApplicationController::class, 'update'])
     ->middleware(['auth', 'verified'])->name('application.update');
 
-//Route::delete('/application/{application}/destroy', [ApplicationController::class, 'destroy'])
-//    ->middleware(['auth', 'verified'])->name('application.destroy');
+Route::delete('/application/{application}/destroy', [ApplicationController::class, 'destroy'])
+    ->middleware(['auth', 'verified'])->name('application.destroy');
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/ma_app.php';

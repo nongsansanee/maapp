@@ -35,13 +35,13 @@ class ApplicationController extends Controller
      */
     public function store(StoreApplicationRequest $request) : RedirectResponse
     {
-        logger($request);
-//        try{
-//            $application = Application::query()->create($request->validated());
-//        }catch (\Exception $exception){
-//            logger($exception);
-//            return back()->with(["intent" => "danger", "msg" => "เพิ่มข้อมูลไม่สำเร็จ เนื่องจาก {$exception->getMessage()}"]);
-//        }
+      //  logger($request);
+        try{
+            $application = Application::query()->create($request->validated());
+        }catch (\Exception $exception){
+            logger($exception);
+            return back()->with(["intent" => "danger", "msg" => "เพิ่มข้อมูลไม่สำเร็จ เนื่องจาก {$exception->getMessage()}"]);
+        }
 
         return back()->with(["intent" => "success", "msg" => "เพิ่มข้อมูลเรียบร้อย"]);
     }

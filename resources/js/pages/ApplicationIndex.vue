@@ -19,7 +19,18 @@ const editApplication = (application) =>{
 
 }
 
+const deleteApplication = (application) =>{
+    console.log(application)
 
+    router.delete(route('application.destroy', application), {}, {
+        preserveState: true,
+        preserveScroll: true,
+        onSuccess: () => { console.log('success')},
+        onError: () => {},
+        onFinish: () => { },
+    })
+
+}
 
 </script>
 <template>
@@ -122,6 +133,7 @@ const editApplication = (application) =>{
                     edit
                     </button>
                     <button
+                        @click="deleteApplication(app)"
                         type="button"
                         class=" mx-2 rounded-md bg-red-700 text-white px-3 py-2 text-sm font-semibold  shadow-xs hover:bg-red-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
