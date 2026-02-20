@@ -72,6 +72,10 @@ const deleteApplication = (application) =>{
             </template>
         </div>
 
+        <Paginate
+            class="relative w-full min-w-min justify-center bg-blue-700 p-2 rounded-sm mt-6"
+            :pagination="props.applications"
+        />
         <table class="w-full shadow-md text-sm text-left text-gray-500 whitespace-nowrap">
             <thead class="text-md text-gray-700 uppercase bg-gray-50">
             <tr class="bg-white">
