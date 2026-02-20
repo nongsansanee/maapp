@@ -67,6 +67,19 @@ const viewRequest = (requests) => {
     });
 }
 
+const deleteRequest = (request) => {
+    if (confirm('Are you sure you want to delete this request?')) {
+        router.delete(route('request.destroy', request), {
+            onSuccess: () => {
+                alert('Request deleted successfully');
+            },
+            onError: (errors) => {
+                console.log('Error deleting request:', errors);
+            },
+        });
+    }
+}
+
 const EditStatusRequest = () => {
     console.log('Changing status for request with actor:', form.actor, 'and new status:', form.status_request.values , form.id);
     form.status_request = form.status_request.values;
@@ -136,7 +149,8 @@ const EditStatusRequest = () => {
                             @click="editRequest(request)"></i>
                         <i class="pi pi-folder text-blue-500 cursor-pointer flex-1 mt-1"
                             @click='viewRequest(request)'></i>
-                        <i class="pi pi-trash text-red-500 cursor-pointer flex-1 mt-1"></i>
+                        <i class="pi pi-trash text-red-500 cursor-pointer flex-1 mt-1"
+                            @click="deleteRequest(request)"></i>
                     </div>
                     <!-- <div class="flex-1">
                         <button @click="editRequest(request)"

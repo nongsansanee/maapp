@@ -271,8 +271,8 @@ class RequestController extends Controller
             'application_id' => 'required',
             // 'type_request' => 'required',
             'description' => 'required',
-
         ]);
+
         $validated['date_request'] = date('Y-m-d 00:00:00', strtotime($validated['date_request']));
         $model_request->fill($validated);
 
@@ -286,11 +286,13 @@ class RequestController extends Controller
             // dd($validated, $model_request, $model_request->getDirty(), $model_request->isClean());
             $model_request->save();
 
-            ModelsRequest_Timeline::create([
-                'name' => $update_request->actor,
-                'status_request' => $update_request->status_request,
-                'request_id' => $model_request->id,
-            ]);
+            if ($update_request->status_request->isDirty() || $update_request->actor->isDirty()) {
+                ModelsRequest_Timeline::create([
+                    'name' => $update_request->actor,
+                    'status_request' => $update_request->status_request,
+                    'request_id' => $model_request->id,
+                ]);
+            }
 
             return redirect()->route('request.index')->with([
                 "intent" => "success",
@@ -318,13 +320,15 @@ class RequestController extends Controller
             'msg' => 'Request status updated successfully!',
         ]);
     }
-    public function destroy(string $id)
+    public function destroy(ModelsRequest $model_request)
     {
-        ModelsRequest::destroy($id);
-        foreach (ModelsRequest_Timeline::where('request_id', $id)->get() as $timeline) {
-            $timeline->delete();
-        }
-        return redirect()->route('request.index')->with([
+        $model_request->delete();
+        $model_request->RequestTimeline()->delete();
+        // dd($model_request);
+        // foreach (ModelsRequest_Timeline::where('request_id', $model_request->id)->get() as $timeline) {
+        //     $timeline->delete();
+        // }
+        return back()->with([
             "intent" => "success",
             'msg' => 'Request deleted successfully!',
         ]);

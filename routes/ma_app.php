@@ -21,3 +21,5 @@ Route::patch('/request/update/{model_request}', [RequestController::class, 'upda
 Route::put('/request/update_status/{request}', [RequestController::class, 'update_status'])->name('request.update_status');
 
 Route::get('/request/show/{request}', [RequestController::class, 'show'])->name('request.show');
+
+Route::delete('/request/destroy/{model_request}', [RequestController::class, 'destroy'])->name('request.destroy');
