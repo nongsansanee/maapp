@@ -56,7 +56,21 @@ const deleteApplication = (application) =>{
 
     <div class="relative overflow-x-auto sm:rounded-lg  mt-4 min-h-screen">
 
+        <div v-if="props.applications.links.length > 3" class="mt-6 flex flex-wrap justify-center">
+            <template v-for="(link, key) in props.applications.links" :key="key">
 
+                <div v-if="link.url === null"
+                     class="mr-1 mb-1 px-4 py-3 text-sm leading-4 text-gray-400 border rounded"
+                     v-html="link.label" />
+
+                <Link v-else
+                      class="mr-1 mb-1 px-4 py-3 text-sm leading-4 border rounded hover:bg-white focus:border-indigo-500 focus:text-indigo-500 transition-colors"
+                      :class="{ 'bg-blue-600 text-white font-bold': link.active, 'bg-white': !link.active }"
+                      :href="link.url" v-html="link.label"
+                />
+
+            </template>
+        </div>
 
         <table class="w-full shadow-md text-sm text-left text-gray-500 whitespace-nowrap">
             <thead class="text-md text-gray-700 uppercase bg-gray-50">
@@ -91,7 +105,7 @@ const deleteApplication = (application) =>{
                 </th>
             </tr>
             <tr
-                v-for="app in applications" :key="app.id"
+                v-for="app in applications.data" :key="app.id"
                 class="bg-white border-b border-b-gray-200">
                 <td  class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">
                     {{ app.id }}
