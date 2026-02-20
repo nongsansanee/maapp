@@ -55,10 +55,9 @@ const deleteApplication = (application) =>{
     </div>
 
     <div class="relative overflow-x-auto sm:rounded-lg  mt-4 min-h-screen">
-        <Paginate
-                    class="relative w-full min-w-min justify-center bg-blue-700 p-2 rounded-sm mt-6"
-                    :pagination="props.applications"
-        />
+
+
+
         <table class="w-full shadow-md text-sm text-left text-gray-500 whitespace-nowrap">
             <thead class="text-md text-gray-700 uppercase bg-gray-50">
             <tr class="bg-white">
@@ -92,7 +91,7 @@ const deleteApplication = (application) =>{
                 </th>
             </tr>
             <tr
-                v-for="app in applications.data" :key="app.id"
+                v-for="app in applications" :key="app.id"
                 class="bg-white border-b border-b-gray-200">
                 <td  class="px-3 py-2 font-medium text-gray-900 whitespace-nowrap">
                     {{ app.id }}

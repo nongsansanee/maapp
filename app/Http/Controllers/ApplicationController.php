@@ -15,7 +15,7 @@ class ApplicationController extends Controller
      */
     public function index()
     {
-        $applications = Application::paginate(10)->withQueryString();
+        $applications = Application::all();
         return Inertia::render('ApplicationIndex', compact('applications'));
 
     }
