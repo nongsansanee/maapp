@@ -80,6 +80,15 @@ return [
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
+            'http_client_options' => [
+                'proxy' => env('PROX_AUTH_URL'),
+                'verify' => false, // สำคัญ: ลองปิดการตรวจใบรับรองเพื่อดูว่าผ่าน Proxy ได้ไหม
+                'curl' => [
+                    CURLOPT_HTTPPROXYTUNNEL => true,       // บังคับเปิด Tunnel สำหรับ HTTPS
+                    CURLOPT_PROXYAUTH      => CURLAUTH_ANY, // ให้เลือกวิธี Authen (Basic/NTLM) เอง
+                    CURLOPT_IPRESOLVE      => 'DEFAULT@SECLEVEL=1', // บังคับ IPv4 (ลดปัญหา Code 35 บน Windows)
+                ],
+            ],
         ],
 
         'papertrail' => [

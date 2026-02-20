@@ -3,16 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Application extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'name_th',
         'name_en',
         'status',
         'application_admin'
     ];
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function scopeStatusName(): string
     {
@@ -23,9 +29,5 @@ class Application extends Model
             $data='ปิดใช้งาน';
 
         return $data;
-    }
-    public function request(): BelongsTo
-    {
-        return $this->belongsTo(Request::class);
     }
 }

@@ -65,7 +65,7 @@ const footerNavItems: NavItem[] = [
 
         <SidebarContent>
             <NavMain :items="mainNavItems" />
-            <Link :href="route('application.create')"> ข้อมูลรายชื่อระบบ </Link>
+            <Link :href="route('application.index')"> ข้อมูลรายชื่อระบบ </Link>
             <Link> ข้อมูลการบำรุงรักษาระบบ </Link>
         </SidebarContent>
 

@@ -31,23 +31,10 @@ const form = useForm({
 const EditRequest = () => {
     form.type_request = form.type_request.value;
     form.status_request = form.status_request.value;
-//     const model_request = {
-//         user_id: App_request.user_id,
-//         requester: App_request.requester,
-//         date_request: App_request.date_request,
-//         type_request: App_request.type_request.value,
-//         description: App_request.description,
-//         application_id: App_request.application_id
-//     }
-//     const model_timeline_request = {
-//         name: App_request.actor,
-//         status_request: App_request.status_request.value,
-//     }
-    console.log('model_request', props.request , 'model_timeline_request', props.request_with_timeline,'from form', form);
-
-    form.patch(route('request.update', props.request_with_timeline), {
-        onSuccess: (res) => {
-            alert(res.props.flash.msg);
+    console.log('request', Apprequest , 'form',form);
+    form.patch(route('request.update', props.request), {
+        onSuccess: () => {
+            alert('Request updated successfully');
             form.reset();
         },
         onError: (errors) => {
@@ -75,7 +62,7 @@ const EditRequest = () => {
                 <div class=" w-4/5 h-1/2 flex flex-col items-center mt-2 gap-2 opacity-100 transition-all duration-750 starting:translate-y-6 starting:opacity-0">
                     <div class=" flex flex-col w-full gap-2">
                         <label for="actor" class=" text-black mt-6">Actor: {{ form.actor }}</label>
-                        <input type="text" id="actor" v-model="form.actor" placeholder="Actor" :class="form.errors.actor && !form.actor ? 'border-red-500 placeholder-red-500:' : ''" 
+                        <input type="text" id="actor" v-model="form.actor" placeholder="Actor" :class="form.errors.actor && !form.actor ? 'border-red-500 placeholder-red-500:' : ''"
                             class="h-10 border border-gray-400 rounded-lg p-2 text-black placeholder-gray-400" />
                             <p v-if="form.errors.actor && !form.actor" class="text-red-500">{{ form.errors.actor }}</p>
                     </div>
@@ -137,7 +124,7 @@ const EditRequest = () => {
                         Request</button>
                 </div>
             </div>
-            
+
         </div>
     </div>
 
