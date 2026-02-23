@@ -28,7 +28,7 @@ Route::get('/application/create', [ApplicationController::class, 'create'])
 Route::post('/application/store', [ApplicationController::class, 'store'])
     ->name('application.store');
 
-Route::get('/application/{application}/edit', [ApplicationController::class, 'edit'])
+Route::get('/application/{hashed_key}/edit', [ApplicationController::class, 'edit'])
     ->middleware(['auth', 'verified'])->name('application.edit');
 
 Route::patch('/application/{application}/update', [ApplicationController::class, 'update'])

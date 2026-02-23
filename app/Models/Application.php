@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Hashids\Hashids;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -29,5 +31,14 @@ class Application extends Model
             $data='ปิดใช้งาน';
 
         return $data;
+    }
+    protected function hashedKey():Attribute
+    {
+        return Attribute::make(
+            get:function(){
+                $hasher = new Hashids(config('app.key'),5);
+                return $hasher->encode($this->attributes['id']);
+            }
+        );
     }
 }

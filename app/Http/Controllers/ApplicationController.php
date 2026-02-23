@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreApplicationRequest;
 use App\Models\Application;
+use Hashids\Hashids;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class ApplicationController extends Controller
@@ -15,7 +17,18 @@ class ApplicationController extends Controller
      */
     public function index()
     {
-        $applications = Application::paginate(10)->withQueryString();
+        $applications = Application::paginate(10)
+            ->through(function ($application) {
+                return [
+                    'hashed_key' => $application->hashed_key,
+                    'id' => $application->id,
+                    'name_th' => $application->name_th,
+                    'name_en' => $application->name_en,
+                    'status' => $application->status,
+                    'application_admin' => $application->application_admin,
+                ];
+            })
+            ->withQueryString();
         return Inertia::render('ApplicationIndex', compact('applications'));
 
     }
@@ -37,7 +50,7 @@ class ApplicationController extends Controller
     {
       //  logger($request);
         try{
-            $application = Application::query()->create($request->validated());
+            $application = Application::query()->createx($request->validated());
         }catch (\Exception $exception){
             logger($exception);
             return back()->with(["intent" => "danger", "msg" => "เพิ่มข้อมูลไม่สำเร็จ เนื่องจาก {$exception->getMessage()}"]);
@@ -66,8 +79,14 @@ class ApplicationController extends Controller
 //        return Inertia::render('ApplicationEdit',['application'=>$application]);
 //    }
 
-    public function edit(Application $application)
+    //public function edit(Application $application)
+    public function edit(String $hashedKey)
     {
+      //  logger('nong test');
+       // Log::info($hashedKey);
+        $hashed = new Hashids(config('app.key'),5);
+        $id = $hashed->decode($hashedKey)[0];
+        $application = Application::query()->find($id);
         return Inertia::render('ApplicationEdit',['application'=>$application]);
     }
 

@@ -8,9 +8,9 @@ const props = defineProps({
     applications: {type: Object, },
 })
 
-const editApplication = (application) =>{
+const editApplication = (hashed_key) =>{
   //  console.log(application)
-    router.get(route('application.edit', application), {}, {
+    router.get(route('application.edit', hashed_key), {}, {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => { console.log('success')},
@@ -148,7 +148,7 @@ const deleteApplication = (application) =>{
                 </td>
                 <td  class="px-3 py-2 font-medium  whitespace-nowrap">
                     <button
-                        @click="editApplication(app)"
+                        @click="editApplication(app.hashed_key)"
                         type="button"
                         class="rounded-md bg-yellow-100 px-3 py-2 text-sm font-semibold text-blue-900 shadow-xs hover:bg-yellow-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
