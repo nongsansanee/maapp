@@ -38,7 +38,7 @@ const addRequest = () => {
 
 </script>
 <template>
-    <div class=" bg-gray-900 w-full h-screen flex flex-col">
+    <div class=" bg-gray-900 w-full min-h-screen h-full flex flex-col">
         <nav class=" w-full flex justify-between items-center bg-gray-700 p-6 h-24">
             <h1 class=" text-white text-2xl font-bold">Welcome to MA Application Request Page</h1>
             <div>
@@ -54,6 +54,8 @@ const addRequest = () => {
                 <p class=" text-black mt-6 w-3/4 text-center">If you want to request about application, please enter
                     detail in the input
                     field below.</p>
+
+                <label v-if="usePage().props.flash.msg" class="text-red-500">{{ usePage().props.flash.msg }}</label>
 
                 <!-- <p class="text-black">{{ user.name }} </p> -->
                 <!-- <p class="text-black">{{ form.applications }} </p> -->

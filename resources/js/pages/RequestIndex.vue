@@ -3,21 +3,20 @@ import { router, usePage, useForm } from '@inertiajs/vue3';
 
 import { ref } from 'vue'
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import { ExclamationTriangleIcon } from '@heroicons/vue/24/outline'
 import 'primeicons/primeicons.css'
+
+import Paginate from '@/Components/Paginate.vue';
 
 const opendialog = ref(false)
 
-const page = usePage();
+// const page = usePage();
 const props = defineProps({
-    applications: Array
+    requests: { type: Object },
+    status_request: { type: Object }
 });
 
-const requests = page.props.requests;
-const status_request = page.props.status_request;
 
-
-console.log('$requests:', requests);
+console.log('$requests:', props.requests);
 
 const form = useForm({
     id: '',
@@ -26,10 +25,10 @@ const form = useForm({
 })
 
 const openDialog = (index) => {
-    form.id = requests[index].id;
-    form.actor = requests[index].actor;
-    form.status_request = requests[index].status_request;
-    console.log('Opening dialog for request:', requests[index].status_request.status);
+    form.id = props.requests.data[index].id;
+    form.actor = props.requests.data[index].actor;
+    form.status_request = props.requests.data[index].status_request;
+    console.log('Opening dialog for request:', props.requests.data[index].status_request);
     opendialog.value = true;
 }
 
@@ -81,7 +80,7 @@ const deleteRequest = (request) => {
 }
 
 const EditStatusRequest = () => {
-    console.log('Changing status for request with actor:', form.actor, 'and new status:', form.status_request.values , form.id);
+    console.log('Changing status for request with actor:', form.actor, 'and new status:', form.status_request.values, form.id);
     form.status_request = form.status_request.values;
     form.put(route('request.update_status', form.id), {
         onSuccess: () => {
@@ -98,7 +97,7 @@ const EditStatusRequest = () => {
 </script>
 
 <template>
-    <div class=" bg-gray-700 w-full h-screen flex flex-col font-noto">
+    <div class=" bg-gray-700 w-full min-h-screen h-full flex flex-col font-noto">
         <nav class=" w-full flex justify-between items-center bg-gray-700 p-6 h-24">
             <h1 class=" text-white text-2xl font-bold">Welcome to MA Application Index Page</h1>
             <div>
@@ -116,6 +115,7 @@ const EditStatusRequest = () => {
                 Request Application
             </a>
             <div class="w-full flex flex-col">
+
                 <div class="w-full flex pl-16 pr-4 gap-4 border-b-2 border-gray-300">
                     <h1 class="text-black text-xl font-bold  mb-4 flex-1">Id</h1>
                     <h1 class="text-black text-xl font-bold  mb-4 flex-2">Actor</h1>
@@ -124,12 +124,11 @@ const EditStatusRequest = () => {
                     <h1 class="text-black text-xl font-bold  mb-4 flex-2">Type Request</h1>
                     <h1 class="text-black text-xl font-bold  mb-4 flex-2">Application</h1>
                     <h1 class="text-black text-xl font-bold  mb-4 flex-2">Admin</h1>
-                    <!-- <h1 class="text-black text-xl font-bold  mb-4 flex-2">Description</h1> -->
                     <h1 class="text-black text-xl font-bold  mb-4 flex-2">Status</h1>
                     <h1 class="text-black text-xl font-bold  mb-4 flex-1">Edit</h1>
                 </div>
                 <div class="w-full flex pt-4 mb-4 border-t border-gray-300 pl-16 pr-4 gap-4 items-center"
-                    v-for="(request, index) in requests" :key="request.id" :values="request.id">
+                    v-for="(request, index) in props.requests.data" :key="request.id" :values="request.id">
                     <p class="text-black text-lg font-medium  flex-1">{{ request.id }}</p>
                     <p class="text-black text-lg font-medium  flex-2">{{ request.actor }}</p>
                     <p class="text-black text-lg font-medium  flex-2">{{ request.requester }}</p>
@@ -137,7 +136,6 @@ const EditStatusRequest = () => {
                     <p class="text-black text-lg font-medium  flex-2">{{ request.type_request.type }}</p>
                     <p class="text-black text-lg font-medium  flex-2">{{ request.application_name_th }}</p>
                     <p class="text-black text-lg font-medium  flex-2">{{ request.application_admin }}</p>
-                    <!-- <p class="text-black text-lg font-medium  flex-2">{{ request.description }}</p> -->
                     <div class="flex flex-2">
                         <div class="flex gap-4 cursor-pointer" @click="openDialog(index)">
                             <p class="text-black text-lg font-medium">{{ request.status_request.status }}</p>
@@ -161,6 +159,10 @@ const EditStatusRequest = () => {
                 </div>
             </div>
         </div>
+
+        <Paginate class="relative w-full min-w-min flex justify-center items-center mt-3" :pagination="props.requests" />
+
+
         <TransitionRoot as="template" :show="opendialog">
             <Dialog class="relative z-10" @close="opendialog = false">
                 <TransitionChild as="template" enter="ease-out duration-300" enter-from="opacity-0" enter-to=""
@@ -197,7 +199,7 @@ const EditStatusRequest = () => {
                                                 <select id="status_type" v-model="form.status_request"
                                                     class="h-10 border border-gray-400 rounded-lg p-2 placeholder-gray-400 w-full">
                                                     <option value="" disabled selected>Select Status Type</option>
-                                                    <option v-for="status in status_request" :key="status"
+                                                    <option v-for="status in props.status_request" :key="status"
                                                         :value="{ status: status.name, values: status.values }">{{
                                                             status.name }}</option>
                                                 </select>

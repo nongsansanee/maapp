@@ -45,7 +45,7 @@ const EditRequest = () => {
 
 </script>
 <template>
-    <div class=" bg-gray-900 w-full h-screen flex flex-col">
+    <div class=" bg-gray-900 w-full min-h-screen h-full flex flex-col">
         <nav class=" w-full flex justify-between items-center bg-gray-700 p-6 h-24">
             <h1 class=" text-white text-2xl font-bold">Welcome to MA Application Edit Request Page</h1>
             <div>

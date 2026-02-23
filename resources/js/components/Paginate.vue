@@ -7,6 +7,8 @@ const props = defineProps({
     pagination: { type: Object, required: true, default: {} },
 })
 
+console.log('pagination', props.pagination)
+
 const emit = defineEmits(['start_loading', 'stop_loading'])
 
 const cpage = ref(props.pagination.current_page)
@@ -16,6 +18,7 @@ const loadPage = (page) => {
     //     preserveState: true,
     //     preserveScroll: true
     // });
+    console.log('load page', page)
 
     router.visit(usePage().url, {
         method: 'get',
@@ -49,14 +52,14 @@ watch(
 </script>
 
 <template>
-    <div class="flex flex-col md:flex-row justify-center md:justify-start items-center">
+    <div class="flex flex-col md:flex-row justify-center items-center">
 
         <div class="flex space-x-1 items-top" v-if="pagination.last_page > 1">
             <button
                 :disabled="noPreviousPage"
-                :class="{'opacity-50': noPreviousPage}"
+                :class="{'opacity-50': noPreviousPage , 'cursor-not-allowed': noPreviousPage}"
                 @click="loadPage(1)"
-                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-200 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 lg:text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-200 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 lg:text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:h-3 lg:w-3" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
@@ -64,9 +67,9 @@ watch(
             </button>
             <button
                 :disabled="noPreviousPage"
-                :class="{'opacity-50': noPreviousPage}"
+                :class="{'opacity-50': noPreviousPage , 'cursor-not-allowed': noPreviousPage}"
                 @click="loadPage(pagination.current_page - 1)"
-                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-200 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-200 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:h-3 lg:w-3" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -87,9 +90,9 @@ watch(
 
             <button
                 :disabled="noNextPage"
-                :class="{'opacity-50': noNextPage}"
+                :class="{'opacity-50': noNextPage , 'cursor-not-allowed': noNextPage}"
                 @click="loadPage(pagination.current_page + 1)"
-                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-300 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-300 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:h-3 lg:w-3" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -98,9 +101,9 @@ watch(
 
             <button
                 :disabled="noNextPage"
-                :class="{'opacity-50': noNextPage}"
+                :class="{'opacity-50': noNextPage , 'cursor-not-allowed': noNextPage}"
                 @click="loadPage(pagination.last_page)"
-                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-300 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                class="inline-flex justify-center items-center w-11 h-11 text-gray-700 bg-white rounded-sm border border-gray-300 shadow-xs outline-hidden hover:bg-gray-50 lg:h-9 lg:w-9 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 lg:h-3 lg:w-3" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>

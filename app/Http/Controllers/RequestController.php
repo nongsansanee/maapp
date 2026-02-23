@@ -10,7 +10,10 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Request as ModelsRequest;
 use App\Models\RequestTimeline as ModelsRequest_Timeline;
+use BaconQrCode\Common\Mode;
+// use Illuminate\Container\Attributes\DB;
 use PhpParser\Node\Expr\AssignOp\Mod;
+use Illuminate\Support\Facades\DB;
 
 use function PHPSTORM_META\map;
 
@@ -21,36 +24,64 @@ class RequestController extends Controller
      */
     public function index()
     {
-        $requests = ModelsRequest::query()
-            ->get()
-            ->map(function ($request) {
-                return [
-                    'id' => $request->id,
-                    'user_id' => $request->user_id,
-                    'user_name' => $request->user->name,
-                    'requester' => $request->requester,
-                    'date_request' => date('d-m-Y', strtotime($request->date_request)),
-                    'application_id' => $request->application->id,
-                    'application_name_th' => $request->application->name_th,
-                    'application_name_en' => $request->application->name_en,
-                    'application_admin' => $request->application->application_admin,
-                    'type_request' => match ($request->type_request) {
-                        'bug' => ['type' => 'Bug', 'values' => 'bug'],
-                        'new_feature' => ['type' => 'New Feature', 'values' => 'new_feature'],
-                        'improvement' => ['type' => 'Improvement', 'values' => 'improvement'],
-                    },
-                    'description' => $request->description,
-                    'actor' => $request->RequestTimeline->last()->name ?? null,
-                    'status_request' => match ($request->RequestTimeline->last()->status_request) {
-                        'pending' => ['status' => 'Pending', 'values' => 'pending'],
-                        'in_progress' => ['status' => 'In Progress', 'values' => 'in_progress'],
-                        'completed' => ['status' => 'Completed', 'values' => 'completed'],
-                        'rejected' => ['status' => 'Rejected', 'values' => 'rejected'],
-                        'testing' => ['status' => 'Testing', 'values' => 'testing'],
-                        'approved' => ['status' => 'Approved', 'values' => 'approved'],
-                    },
-                ];
-            });
+        $requests = ModelsRequest::paginate(5)->withQueryString()->through(function ($request) {
+            return [
+                'id' => $request->id,
+                'user_id' => $request->user_id,
+                'user_name' => $request->user->name,
+                'requester' => $request->requester,
+                'date_request' => date('d-m-Y', strtotime($request->date_request)),
+                'application_id' => $request->application->id,
+                'application_name_th' => $request->application->name_th,
+                'application_name_en' => $request->application->name_en,
+                'application_admin' => $request->application->application_admin,
+                'type_request' => match ($request->type_request) {
+                    'bug' => ['type' => 'Bug', 'value' => 'bug'],
+                    'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
+                    'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
+                },
+                'description' => $request->description,
+                'actor' => $request->RequestTimeline->last()->name ?? null,
+                'status_request' => match ($request->RequestTimeline->last()->status_request) {
+                    'pending' => ['status' => 'Pending', 'value' => 'pending'],
+                    'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
+                    'completed' => ['status' => 'Completed', 'value' => 'completed'],
+                    'rejected' => ['status' => 'Rejected', 'value' => 'rejected'],
+                    'testing' => ['status' => 'Testing', 'value' => 'testing'],
+                    'approved' => ['status' => 'Approved', 'value' => 'approved'],
+                },
+            ];
+        });
+        // $requests = ModelsRequest::query()
+        //     ->get()
+        //     ->map(function ($request) {
+        //         return [
+        //             'id' => $request->id,
+        //             'user_id' => $request->user_id,
+        //             'user_name' => $request->user->name,
+        //             'requester' => $request->requester,
+        //             'date_request' => date('d-m-Y', strtotime($request->date_request)),
+        //             'application_id' => $request->application->id,
+        //             'application_name_th' => $request->application->name_th,
+        //             'application_name_en' => $request->application->name_en,
+        //             'application_admin' => $request->application->application_admin,
+        //             'type_request' => match ($request->type_request) {
+        //                 'bug' => ['type' => 'Bug', 'values' => 'bug'],
+        //                 'new_feature' => ['type' => 'New Feature', 'values' => 'new_feature'],
+        //                 'improvement' => ['type' => 'Improvement', 'values' => 'improvement'],
+        //             },
+        //             'description' => $request->description,
+        //             'actor' => $request->RequestTimeline->last()->name ?? null,
+        //             'status_request' => match ($request->RequestTimeline->last()->status_request) {
+        //                 'pending' => ['status' => 'Pending', 'values' => 'pending'],
+        //                 'in_progress' => ['status' => 'In Progress', 'values' => 'in_progress'],
+        //                 'completed' => ['status' => 'Completed', 'values' => 'completed'],
+        //                 'rejected' => ['status' => 'Rejected', 'values' => 'rejected'],
+        //                 'testing' => ['status' => 'Testing', 'values' => 'testing'],
+        //                 'approved' => ['status' => 'Approved', 'values' => 'approved'],
+        //             },
+        //         ];
+        //     });
 
         $status = [
             ['values' => 'pending', 'name' => 'Pending'],
@@ -62,7 +93,6 @@ class RequestController extends Controller
         ];
 
         // dd($requests);
-
 
         return Inertia::render('RequestIndex', [
             'requests' => $requests,
@@ -104,22 +134,53 @@ class RequestController extends Controller
     {
         // dd($request->all());
 
-        $Modelrequest = ModelsRequest::create([
-            'user_id' => $request->user_id,
-            'requester' => $request->requester,
-            'date_request' => $request->date_request,
-            'application_id' => $request->application,
-            'type_request' => $request->type_request,
-            'description' => $request->description,
-            'name' => $request->actor,
-            'status_request' => $request->status_request,
-        ]);
+        try {
 
-        ModelsRequest_Timeline::create([
-            'request_id' => $Modelrequest->id,
-            'name' => $request->actor,
-            'status_request' => $request->status_request,
-        ]);
+            DB::beginTransaction();
+
+            $Modelrequest = ModelsRequest::create([
+                'user_id' => $request->user_id,
+                'requester' => $request->requester,
+                'date_request' => $request->date_request,
+                'application_id' => $request->application,
+                'type_request' => $request->type_request,
+                'description' => $request->description,
+                'name' => $request->actor,
+                'status_request' => $request->status_request,
+            ]);
+
+            ModelsRequest_Timeline::create([
+                'request_id' => $Modelrequest->id,
+                'name' => $request->actor,
+                'status_request' => $request->status_request,
+            ]);
+
+            dd($Modelrequest, $Modelrequest->RequestTimeline);
+
+            DB::commit();
+
+        } catch (\Exception $e) {
+
+            DB::rollBack(); 
+            return back()->withErrors($e->getMessage())->withInput();
+        }
+
+        // $Modelrequest = ModelsRequest::create([
+        //     'user_id' => $request->user_id,
+        //     'requester' => $request->requester,
+        //     'date_request' => $request->date_request,
+        //     'application_id' => $request->application,
+        //     'type_request' => $request->type_request,
+        //     'description' => $request->description,
+        //     'name' => $request->actor,
+        //     'status_request' => $request->status_request,
+        // ]);
+
+        // ModelsRequest_Timeline::create([
+        //     'request_id' => $Modelrequest->id,
+        //     'name' => $request->actor,
+        //     'status_request' => $request->status_request,
+        // ]);
 
         // return back()->with([
         //     "intent" => "success",
@@ -136,10 +197,10 @@ class RequestController extends Controller
      */
     public function show(ModelsRequest $request)
     {
+        $request_id = $request->id;
 
-        dd('request', $request);
         $request = ModelsRequest::query()
-            ->where('id', $request->id)
+            ->where('id', $request_id)
             ->get()
             ->map(function ($request) {
                 return [
@@ -158,8 +219,18 @@ class RequestController extends Controller
                         'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
                     },
                     'description' => $request->description,
-                    'actor' => $request->RequestTimeline->last()->name ?? null,
-                    'status_request' => match ($request->RequestTimeline->last()->status_request) {
+                    'created_at' => date('d-m-Y H:i:s', strtotime($request->created_at)),
+                ];
+            })->first();
+
+        $request_timeline = ModelsRequest_Timeline::query()
+            ->where('request_id', $request_id)
+            ->get()
+            ->map(function ($timeline) {
+                return [
+                    'id' => $timeline->id,
+                    'name' => $timeline->name,
+                    'status_request' => match ($timeline->status_request) {
                         'pending' => ['status' => 'Pending', 'value' => 'pending'],
                         'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
                         'completed' => ['status' => 'Completed', 'value' => 'completed'],
@@ -167,13 +238,15 @@ class RequestController extends Controller
                         'testing' => ['status' => 'Testing', 'value' => 'testing'],
                         'approved' => ['status' => 'Approved', 'value' => 'approved'],
                     },
+                    'created_at' => date('d-m-Y H:i:s', strtotime($timeline->created_at)),
                 ];
-            })->first();
+            });
 
-        // dd($request);
+        // dd($request , $request_timeline);
 
         return Inertia::render('RequestShow', [
-            "request" => $request
+            "request" => $request,
+            "request_timeline" => $request_timeline
         ]);
     }
 
@@ -334,3 +407,7 @@ class RequestController extends Controller
         ]);
     }
 }
+
+
+// page timeline เเต่ละ request จะมี timeline ของการเปลี่ยนสถานะ ?? requestShow
+//
