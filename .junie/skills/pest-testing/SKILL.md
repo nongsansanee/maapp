@@ -1,15 +1,17 @@
 ---
 name: pest-testing
-description: >-
-  Tests applications using the Pest 4 PHP framework. Activates when writing tests, creating unit or feature
-  tests, adding assertions, testing Livewire components, browser testing, debugging test failures,
-  working with datasets or mocking; or when the user mentions test, spec, TDD, expects, assertion,
-  coverage, or needs to verify functionality works.
+description: "Tests applications using the Pest 4 PHP framework. Activates when writing tests, creating unit or feature tests, adding assertions, testing Livewire components, browser testing, debugging test failures, working with datasets or mocking; or when the user mentions test, spec, TDD, expects, assertion, coverage, or needs to verify functionality works."
+license: MIT
+metadata:
+  author: laravel
 ---
 
 # Pest Testing 4
 
+
+
 ## When to Apply
+
 
 Activate this skill when:
 
@@ -19,49 +21,65 @@ Activate this skill when:
 - Working with browser testing or smoke testing
 - Writing architecture tests or visual regression tests
 
+
 ## Documentation
+
 
 Use `search-docs` for detailed Pest 4 patterns and documentation.
 
+
 ## Basic Usage
+
+
 
 ### Creating Tests
 
+
 All tests must be written using Pest. Use `php artisan make:test --pest {name}`.
 
+
 ### Test Organization
+
 
 - Unit/Feature tests: `tests/Feature` and `tests/Unit` directories.
 - Browser tests: `tests/Browser/` directory.
 - Do NOT remove tests without approval - these are core application code.
 
+
 ### Basic Test Structure
 
-<code-snippet name="Basic Pest Test Example" lang="php">
 
+<!-- Basic Pest Test Example -->
+```php
 it('is true', function () {
     expect(true)->toBeTrue();
 });
+```
 
-</code-snippet>
+
+
 
 ### Running Tests
+
 
 - Run minimal tests with filter before finalizing: `php artisan test --compact --filter=testName`.
 - Run all tests: `php artisan test --compact`.
 - Run file: `php artisan test --compact tests/Feature/ExampleTest.php`.
 
+
 ## Assertions
+
 
 Use specific assertions (`assertSuccessful()`, `assertNotFound()`) instead of `assertStatus()`:
 
-<code-snippet name="Pest Response Assertion" lang="php">
-
+<!-- Pest Response Assertion -->
+```php
 it('returns all', function () {
     $this->postJson('/api/docs', [])->assertSuccessful();
 });
+```
 
-</code-snippet>
+
 
 | Use | Instead of |
 |-----|------------|
@@ -69,26 +87,33 @@ it('returns all', function () {
 | `assertNotFound()` | `assertStatus(404)` |
 | `assertForbidden()` | `assertStatus(403)` |
 
+
 ## Mocking
+
 
 Import mock function before use: `use function Pest\Laravel\mock;`
 
+
 ## Datasets
+
 
 Use datasets for repetitive tests (validation rules, etc.):
 
-<code-snippet name="Pest Dataset Example" lang="php">
-
+<!-- Pest Dataset Example -->
+```php
 it('has emails', function (string $email) {
     expect($email)->not->toBeEmpty();
 })->with([
     'james' => 'james@laravel.com',
     'taylor' => 'taylor@laravel.com',
 ]);
+```
 
-</code-snippet>
+
+
 
 ## Pest 4 Features
+
 
 | Feature | Purpose |
 |---------|---------|
@@ -98,7 +123,9 @@ it('has emails', function (string $email) {
 | Test Sharding | Parallel CI runs |
 | Architecture Testing | Enforce code conventions |
 
+
 ### Browser Test Example
+
 
 Browser tests run in real browsers for full integration testing:
 
@@ -111,8 +138,8 @@ Browser tests run in real browsers for full integration testing:
 - Switch color schemes (light/dark mode) when appropriate.
 - Take screenshots or pause tests for debugging.
 
-<code-snippet name="Pest Browser Test Example" lang="php">
-
+<!-- Pest Browser Test Example -->
+```php
 it('may reset the password', function () {
     Notification::fake();
 
@@ -129,43 +156,56 @@ it('may reset the password', function () {
 
     Notification::assertSent(ResetPassword::class);
 });
+```
 
-</code-snippet>
+
+
 
 ### Smoke Testing
 
+
 Quickly validate multiple pages have no JavaScript errors:
 
-<code-snippet name="Pest Smoke Testing Example" lang="php">
-
+<!-- Pest Smoke Testing Example -->
+```php
 $pages = visit(['/', '/about', '/contact']);
 
 $pages->assertNoJavaScriptErrors()->assertNoConsoleLogs();
+```
 
-</code-snippet>
+
+
 
 ### Visual Regression Testing
 
+
 Capture and compare screenshots to detect visual changes.
+
 
 ### Test Sharding
 
+
 Split tests across parallel processes for faster CI runs.
+
 
 ### Architecture Testing
 
+
 Pest 4 includes architecture testing (from Pest 3):
 
-<code-snippet name="Architecture Test Example" lang="php">
-
+<!-- Architecture Test Example -->
+```php
 arch('controllers')
     ->expect('App\Http\Controllers')
     ->toExtendNothing()
     ->toHaveSuffix('Controller');
+```
 
-</code-snippet>
+
+
 
 ## Common Pitfalls
+
 
 - Not importing `use function Pest\Laravel\mock;` before using mock
 - Using `assertStatus(200)` instead of `assertSuccessful()`

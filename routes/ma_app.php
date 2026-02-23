@@ -14,7 +14,7 @@ Route::get('/request/create', [RequestController::class, 'create'])->middleware(
 
 Route::post('/request/store', [RequestController::class, 'store'])->name('request.store');
 
-Route::get('/request/edit/{request}', [RequestController::class, 'edit'])->name('request.edit');
+Route::get('/request/edit/{hashed_key}', [RequestController::class, 'edit'])->name('request.edit');
 
 Route::patch('/request/update/{request_model}', [RequestController::class, 'update'])->name('request.update');
 

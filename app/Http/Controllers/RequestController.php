@@ -11,9 +11,11 @@ use Inertia\Inertia;
 use App\Models\Request as ModelsRequest;
 use App\Models\RequestTimeline as ModelsRequest_Timeline;
 use BaconQrCode\Common\Mode;
-// use Illuminate\Container\Attributes\DB;
+use Dotenv\Util\Str;
 use PhpParser\Node\Expr\AssignOp\Mod;
 use Illuminate\Support\Facades\DB;
+use Hashids\Hashids;
+use Illuminate\Support\Facades\Log;
 
 use function PHPSTORM_META\map;
 
@@ -50,38 +52,9 @@ class RequestController extends Controller
                     'testing' => ['status' => 'Testing', 'value' => 'testing'],
                     'approved' => ['status' => 'Approved', 'value' => 'approved'],
                 },
+                'hashed_key' => $request->hashed_key,
             ];
         });
-        // $requests = ModelsRequest::query()
-        //     ->get()
-        //     ->map(function ($request) {
-        //         return [
-        //             'id' => $request->id,
-        //             'user_id' => $request->user_id,
-        //             'user_name' => $request->user->name,
-        //             'requester' => $request->requester,
-        //             'date_request' => date('d-m-Y', strtotime($request->date_request)),
-        //             'application_id' => $request->application->id,
-        //             'application_name_th' => $request->application->name_th,
-        //             'application_name_en' => $request->application->name_en,
-        //             'application_admin' => $request->application->application_admin,
-        //             'type_request' => match ($request->type_request) {
-        //                 'bug' => ['type' => 'Bug', 'values' => 'bug'],
-        //                 'new_feature' => ['type' => 'New Feature', 'values' => 'new_feature'],
-        //                 'improvement' => ['type' => 'Improvement', 'values' => 'improvement'],
-        //             },
-        //             'description' => $request->description,
-        //             'actor' => $request->RequestTimeline->last()->name ?? null,
-        //             'status_request' => match ($request->RequestTimeline->last()->status_request) {
-        //                 'pending' => ['status' => 'Pending', 'values' => 'pending'],
-        //                 'in_progress' => ['status' => 'In Progress', 'values' => 'in_progress'],
-        //                 'completed' => ['status' => 'Completed', 'values' => 'completed'],
-        //                 'rejected' => ['status' => 'Rejected', 'values' => 'rejected'],
-        //                 'testing' => ['status' => 'Testing', 'values' => 'testing'],
-        //                 'approved' => ['status' => 'Approved', 'values' => 'approved'],
-        //             },
-        //         ];
-        //     });
 
         $status = [
             ['values' => 'pending', 'name' => 'Pending'],
@@ -130,6 +103,7 @@ class RequestController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    // public function store(StoreRequestRequest $request)
     public function store(StoreRequestRequest $request)
     {
         // dd($request->all());
@@ -158,10 +132,9 @@ class RequestController extends Controller
             dd($Modelrequest, $Modelrequest->RequestTimeline);
 
             DB::commit();
-
         } catch (\Exception $e) {
 
-            DB::rollBack(); 
+            DB::rollBack();
             return back()->withErrors($e->getMessage())->withInput();
         }
 
@@ -195,33 +168,34 @@ class RequestController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ModelsRequest $request)
+    public function show(String $hashed_key)
     {
+        $hashed = new Hashids(config('app.key'), 5);
+        $decoded_array = $hashed->decode($hashed_key);
+        $decoded = $decoded_array[0] ?? null;
+        $request = ModelsRequest::query()->find($decoded);
+
+        // dd($request);
         $request_id = $request->id;
 
-        $request = ModelsRequest::query()
-            ->where('id', $request_id)
-            ->get()
-            ->map(function ($request) {
-                return [
-                    'id' => $request->id,
-                    'user_id' => $request->user_id,
-                    'user_name' => $request->user->name,
-                    'requester' => $request->requester,
-                    'date_request' => date('d-m-Y', strtotime($request->date_request)),
-                    'application_id' => $request->application->id,
-                    'application_name_th' => $request->application->name_th,
-                    'application_name_en' => $request->application->name_en,
-                    'application_admin' => $request->application->application_admin,
-                    'type_request' => match ($request->type_request) {
-                        'bug' => ['type' => 'Bug', 'value' => 'bug'],
-                        'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
-                        'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
-                    },
-                    'description' => $request->description,
-                    'created_at' => date('d-m-Y H:i:s', strtotime($request->created_at)),
-                ];
-            })->first();
+        $request =  [
+            'id' => $request->id,
+            'user_id' => $request->user_id,
+            'user_name' => $request->user->name,
+            'requester' => $request->requester,
+            'date_request' => date('d-m-Y', strtotime($request->date_request)),
+            'application_id' => $request->application->id,
+            'application_name_th' => $request->application->name_th,
+            'application_name_en' => $request->application->name_en,
+            'application_admin' => $request->application->application_admin,
+            'type_request' => match ($request->type_request) {
+                'bug' => ['type' => 'Bug', 'value' => 'bug'],
+                'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
+                'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
+            },
+            'description' => $request->description,
+            'created_at' => date('d-m-Y H:i:s', strtotime($request->created_at)),
+        ];
 
         $request_timeline = ModelsRequest_Timeline::query()
             ->where('request_id', $request_id)
@@ -253,8 +227,16 @@ class RequestController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(ModelsRequest $request)
+    // public function edit(ModelsRequest $request)
+    public function edit(String $hashed_key)
     {
+        Log::Info('Edit request with hashed key: ' . $hashed_key);
+        $hashed = new Hashids(config('app.key'), 5);
+        $decoded_array = $hashed->decode($hashed_key);
+        $decoded = $decoded_array[0] ?? null;
+        $request = ModelsRequest::query()->find($decoded);
+
+
         $request_with_timeline = [
             'id' => $request->id,
             'user_id' => $request->user_id,

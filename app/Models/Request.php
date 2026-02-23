@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Hashids\Hashids;
 
 class Request extends Model
 {
@@ -32,5 +34,15 @@ class Request extends Model
     public function RequestTimeline(): HasMany
     {
         return $this->hasMany(RequestTimeline::class);
+    }
+
+    protected function hashedKey(): Attribute
+    {
+        return Attribute::make(
+            get:function() {
+                $hasher = new Hashids(config('app.key'), 5);
+                return $hasher->encode($this->attributes['id']);
+            }
+        );
     }
 }

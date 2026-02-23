@@ -144,9 +144,9 @@ const EditStatusRequest = () => {
                     </div>
                     <div class="flex flex-1">
                         <i class="pi pi-pencil text-blue-500 cursor-pointer flex-1 mt-1"
-                            @click="editRequest(request)"></i>
+                            @click="editRequest(request.hashed_key)"></i>
                         <i class="pi pi-folder text-blue-500 cursor-pointer flex-1 mt-1"
-                            @click='viewRequest(request)'></i>
+                            @click='viewRequest(request.hashed_key)'></i>
                         <i class="pi pi-trash text-red-500 cursor-pointer flex-1 mt-1"
                             @click="deleteRequest(request)"></i>
                     </div>
