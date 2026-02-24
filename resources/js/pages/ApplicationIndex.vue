@@ -8,6 +8,21 @@ const props = defineProps({
     applications: {type: Object, },
 })
 
+const form = useForm({
+    status: '',
+    is_search: false,
+});
+const searchApplication = () => {
+    form.transform((data) => ({
+        ...data,
+        is_search: true,
+    }))
+        .get(route('application.index'),{
+            preserveState: true,
+            preserveScroll: true,
+
+        })
+}
 const editApplication = (hashed_key) =>{
   //  console.log(application)
     router.get(route('application.edit', hashed_key), {}, {
@@ -41,6 +56,40 @@ const deleteApplication = (application) =>{
     <div class="w-full flex justify-center bg-red-200 my-2">
         <label v-if="usePage().props.flash.msg" :intent="usePage().props.flash.intent" >
             {{ usePage().props.flash.msg }}
+        </label>
+    </div>
+
+        <div class="w-full flex justify-center items-center">
+            <label for="country" class="px-2 text-sm font-medium text-gray-900 whitespace-nowrap">
+                สถานะการใช้งาน</label>
+            <div class=" grid grid-cols-1">
+                <select
+                         v-model="form.status"
+                         class="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                    <option value="">ระบุเพื่อค้นหา</option>
+                    <option value="1">เปิด</option>
+                    <option value="0">ปิด</option>
+                </select>
+                <svg viewBox="0 0 16 16" fill="currentColor" data-slot="icon" aria-hidden="true" class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4">
+                    <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" fill-rule="evenodd" />
+                </svg>
+            </div>
+
+
+                <button
+                    :disabled="form.processing"
+                    @click="searchApplication"
+                    type="button"
+                    class=" mx-2 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                >
+                    <span>{{ form.processing ? 'กำลังค้นหา...' : 'ค้นหา' }}</span>
+                </button>
+
+        </div>
+    <div class=" m-2 w-full flex justify-center text-red-600">
+
+        <label v-if="usePage().props.errors"  >
+            {{ usePage().props.errors.status }}
         </label>
     </div>
     <div class="mt-6 mx-4 flex items-center ">

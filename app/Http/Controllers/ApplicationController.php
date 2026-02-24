@@ -8,6 +8,8 @@ use Hashids\Hashids;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ApplicationController extends Controller
@@ -15,9 +17,27 @@ class ApplicationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $applications = Application::paginate(10)
+       // dd($request->all());
+        if( request('is_search') ) {
+            $validator = Validator::make($request->all(), [
+                'status' => [ Rule::In([0,1])],
+            ], [
+                'status' => 'status invalid',
+            ]);
+
+            // ถ้า validate ไม่ผ่านให้ไป route ที่ระบุ พร้อมส่ง error และ input เดิมกลับไปด้วย
+            if ($validator->fails()) {
+                return back()->withErrors($validator)->withInput();
+            }
+        }
+        $applications = Application::query()
+            ->when(request()->filled('status'), function ($query, $status) {
+                //  dd($status);
+                return  $query->where('status', request('status'));
+            })
+            ->paginate(10)
             ->through(function ($application) {
                 return [
                     'hashed_key' => $application->hashed_key,
