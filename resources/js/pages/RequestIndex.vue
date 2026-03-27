@@ -11,24 +11,38 @@ const opendialog = ref(false)
 
 // const page = usePage();
 const props = defineProps({
+    applications: Array,
     requests: { type: Object },
-    status_request: { type: Object }
+    status_request: { type: Object },
+    filter_clear: { type: Boolean }
 });
 
-
+console.log('props in index page:',props.filter_clear);
 console.log('$requests:', props.requests);
 
 const form = useForm({
     id: '',
     actor: '',
     status_request: '',
+    filter_requester: '',
+    filter_date_start: '',
+    filter_date_end: '',
+    filter_type: '',
+    filter_app: '',
+    filter_admin: '',
+    filter_status: '',
+    filter_clear: false,
 })
+
+form.filter_clear = props.filter_clear;
+
+const uniqueAdmins = [...new Set(props.applications.map(app => app.application_admin))];
 
 const openDialog = (index) => {
     form.id = props.requests.data[index].id;
     form.actor = props.requests.data[index].actor;
     form.status_request = props.requests.data[index].status_request;
-    console.log('Opening dialog for request:', props.requests.data[index].status_request);
+    console.log('Opening dialog for request:', form.status_request);
     opendialog.value = true;
 }
 
@@ -94,6 +108,41 @@ const EditStatusRequest = () => {
     });
 }
 
+const filter = () => {
+    console.log('Filtering requests by type:', form.filter_type, 'and status:', form.filter_status);
+    form.transform((data) => ({
+        ...data,
+        filter_requester: form.filter_requester,
+        filter_date_start: form.filter_date_start,
+        filter_date_end: form.filter_date_end,
+        filter_type: form.filter_type,
+        filter_app: form.filter_app,
+        filter_admin: form.filter_admin,
+        filter_status: form.filter_status
+    })).get(route('request.index'), {
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
+
+const clearFilter = () => {
+    form.filter_clear = true;
+    form.get(route('request.index'), {
+        onSuccess: () => {
+            form.filter_requester = '';
+            form.filter_date_start = '';
+            form.filter_date_end = '';
+            form.filter_type = '';
+            form.filter_app = '';
+            form.filter_admin = '';
+            form.filter_status = '';
+            form.filter_clear = false;
+        },
+        preserveState: true,
+        preserveScroll: true,
+    });
+}
+
 </script>
 
 <template>
@@ -115,6 +164,45 @@ const EditStatusRequest = () => {
                 Request Application
             </a>
             <div class="w-full flex flex-col">
+
+                <div class="w-full flex mb-8 pb-4 pl-4 pr-4 gap-4 border-b-2 border-gray-300">
+                    <input type="text" v-model="form.filter_requester" class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11 flex-1" placeholder="Search by Requester" @input="filter()">
+                    <div class=" flex flex-col gap-2">
+                        <input type="date" v-model="form.filter_date_start" @change="filter()" class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11">
+                        <input type="date" v-if="!form.filter_date_start" placeholder="Not select date start" class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 cursor-not-allowed opacity-50">
+                        <input type="date" v-if="form.filter_date_start" v-model="form.filter_date_end" @change="filter()" :min="form.filter_date_start" class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11">
+                    </div>
+
+                    <select name="filter_type" id="filter_type"
+                        class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11"
+                        v-model="form.filter_type" @change="filter()">
+                        <option value="" disabled selected>Filter by Type</option>
+                        <option value="Bug">Bug</option>
+                        <option value="new_feature">New Feature</option>
+                        <option value="Improvement">Improvement</option>
+                    </select>
+                    <select name="filter_app" id="filter_app"
+                        class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11"
+                        v-model="form.filter_app" @change="filter()">
+                        <option value="" disabled selected>Filter by Application</option>
+                        <option v-for="app in props.applications" :key="app.id" :value="app.id">{{ app.name_th }}
+                        </option>
+                    </select>
+                    <select name="filter_admin" id="filter_admin"
+                        class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11"
+                        v-model="form.filter_admin" @change="filter()">
+                        <option value="" disabled selected>Filter by Admin</option>
+                        <option v-for="admin in uniqueAdmins" :key="admin" :value="admin">{{ admin }}</option>
+                    </select>
+                    <select name="filter_status" id="filter_status"
+                        class=" text-black border border-gray-400 rounded-lg p-2 placeholder-gray-400 h-11"
+                         v-model="form.filter_status" @change="filter()">
+                        <option value="" disabled selected>Filter by Status</option>
+                        <option v-for="status in props.status_request" :key="status" :value="status.values">{{
+                            status.name }}</option>
+                    </select>
+                    <button @click="clearFilter()" class="bg-red-600 text-white px-4 py-2 rounded-lg h-11 hover:bg-red-700">Clear Filter</button>
+                </div>
 
                 <div class="w-full flex pl-16 pr-4 gap-4 border-b-2 border-gray-300">
                     <h1 class="text-black text-xl font-bold  mb-4 flex-1">Id</h1>
@@ -160,7 +248,8 @@ const EditStatusRequest = () => {
             </div>
         </div>
 
-        <Paginate class="relative w-full min-w-min flex justify-center items-center mt-3" :pagination="props.requests" />
+        <Paginate class="relative w-full min-w-min flex justify-center items-center mt-3"
+            :pagination="props.requests" />
 
 
         <TransitionRoot as="template" :show="opendialog">
@@ -200,7 +289,7 @@ const EditStatusRequest = () => {
                                                     class="h-10 border border-gray-400 rounded-lg p-2 placeholder-gray-400 w-full">
                                                     <option value="" disabled selected>Select Status Type</option>
                                                     <option v-for="status in props.status_request" :key="status"
-                                                        :value="{ status: status.name, values: status.values }">{{
+                                                        :value="{ status: status.name, value: status.values }">{{
                                                             status.name }}</option>
                                                 </select>
                                             </div>

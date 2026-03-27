@@ -8,6 +8,10 @@ use App\Http\Controllers\RequestController;
 //     return Inertia::render('ApplicationIndex');
 // })->name('application.index');
 
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->name('dashboard');
+
 Route::get('/request', [RequestController::class, 'index'])->name('request.index');
 
 Route::get('/request/create', [RequestController::class, 'create'])->middleware(['auth'])->name('request.create');

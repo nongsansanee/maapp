@@ -36,6 +36,11 @@ class Request extends Model
         return $this->hasMany(RequestTimeline::class);
     }
 
+    public function latestTimeline()
+    {
+        return $this->hasOne(RequestTimeline::class)->latestOfMany();
+    }
+
     protected function hashedKey(): Attribute
     {
         return Attribute::make(

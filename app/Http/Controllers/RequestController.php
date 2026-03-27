@@ -16,6 +16,7 @@ use PhpParser\Node\Expr\AssignOp\Mod;
 use Illuminate\Support\Facades\DB;
 use Hashids\Hashids;
 use Illuminate\Support\Facades\Log;
+use SebastianBergmann\Environment\Console;
 
 use function PHPSTORM_META\map;
 
@@ -24,37 +25,75 @@ class RequestController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $filter)
     {
-        $requests = ModelsRequest::paginate(5)->withQueryString()->through(function ($request) {
-            return [
-                'id' => $request->id,
-                'user_id' => $request->user_id,
-                'user_name' => $request->user->name,
-                'requester' => $request->requester,
-                'date_request' => date('d-m-Y', strtotime($request->date_request)),
-                'application_id' => $request->application->id,
-                'application_name_th' => $request->application->name_th,
-                'application_name_en' => $request->application->name_en,
-                'application_admin' => $request->application->application_admin,
-                'type_request' => match ($request->type_request) {
-                    'bug' => ['type' => 'Bug', 'value' => 'bug'],
-                    'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
-                    'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
-                },
-                'description' => $request->description,
-                'actor' => $request->RequestTimeline->last()->name ?? null,
-                'status_request' => match ($request->RequestTimeline->last()->status_request) {
-                    'pending' => ['status' => 'Pending', 'value' => 'pending'],
-                    'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
-                    'completed' => ['status' => 'Completed', 'value' => 'completed'],
-                    'rejected' => ['status' => 'Rejected', 'value' => 'rejected'],
-                    'testing' => ['status' => 'Testing', 'value' => 'testing'],
-                    'approved' => ['status' => 'Approved', 'value' => 'approved'],
-                },
-                'hashed_key' => $request->hashed_key,
-            ];
-        });
+        // if($filter->filled('filter_type') || $filter->filled('filter_status')) {
+        //      dd($filter);
+        // }
+        Log::Info('Clearing filters, current filter values: ' . json_encode($filter->all()));
+        if ($filter->filled('filter_clear') && $filter->get('filter_clear') == 'true') {
+            // $filter->replace([]);
+            return redirect()->route('request.index')->with([
+                "intent" => "success",
+                'msg' => 'Filters cleared successfully!',
+            ]);
+            
+        }
+        $requests = ModelsRequest::query()
+            ->when($filter->filled('filter_requester'), function ($query) {
+                return  $query->where('requester', 'like', '%' . request('filter_requester') . '%');
+            })
+            ->when($filter->filled('filter_date_start') && $filter->filled('filter_date_end'), function ($query) {
+                return  $query->whereBetween('date_request', [request('filter_date_start'), request('filter_date_end')]);
+            })
+            ->when($filter->filled('filter_type'), function ($query) {
+                return  $query->where('type_request', request('filter_type'));
+            })
+            ->when($filter->filled('filter_app'), function ($query) {
+                return  $query->whereHas('application', function ($query) {
+                    $query->where('id', request('filter_app'));
+                });
+            })
+            ->when($filter->filled('filter_admin'), function ($query) {
+                return  $query->whereHas('application', function ($query) {
+                    $query->where('application_admin', request('filter_admin'));
+                });
+            })
+            ->when($filter->filled('filter_status'), function ($query) {
+                //    dd($query);
+                return  $query->whereHas('latestTimeline', function ($query) {
+                    $query->where('status_request', request('filter_status'));
+                });
+            })
+            ->paginate(5)->withQueryString()->through(function ($request) {
+                return [
+                    'id' => $request->id,
+                    'user_id' => $request->user_id,
+                    'user_name' => $request->user->name,
+                    'requester' => $request->requester,
+                    'date_request' => date('d-m-Y', strtotime($request->date_request)),
+                    'application_id' => $request->application->id,
+                    'application_name_th' => $request->application->name_th,
+                    'application_name_en' => $request->application->name_en,
+                    'application_admin' => $request->application->application_admin,
+                    'type_request' => match ($request->type_request) {
+                        'bug' => ['type' => 'Bug', 'value' => 'bug'],
+                        'new_feature' => ['type' => 'New Feature', 'value' => 'new_feature'],
+                        'improvement' => ['type' => 'Improvement', 'value' => 'improvement'],
+                    },
+                    'description' => $request->description,
+                    'actor' => $request->RequestTimeline->last()->name ?? null,
+                    'status_request' => match ($request->RequestTimeline->last()->status_request) {
+                        'pending' => ['status' => 'Pending', 'value' => 'pending'],
+                        'in_progress' => ['status' => 'In Progress', 'value' => 'in_progress'],
+                        'completed' => ['status' => 'Completed', 'value' => 'completed'],
+                        'rejected' => ['status' => 'Rejected', 'value' => 'rejected'],
+                        'testing' => ['status' => 'Testing', 'value' => 'testing'],
+                        'approved' => ['status' => 'Approved', 'value' => 'approved'],
+                    },
+                    'hashed_key' => $request->hashed_key,
+                ];
+            });
 
         $status = [
             ['values' => 'pending', 'name' => 'Pending'],
@@ -66,8 +105,10 @@ class RequestController extends Controller
         ];
 
         // dd($requests);
+        $applications = Application::where('status', 1)->get();
 
         return Inertia::render('RequestIndex', [
+            'applications' => $applications,
             'requests' => $requests,
             'status_request' => $status,
         ]);
@@ -129,7 +170,7 @@ class RequestController extends Controller
                 'status_request' => $request->status_request,
             ]);
 
-            dd($Modelrequest, $Modelrequest->RequestTimeline);
+            // dd($Modelrequest, $Modelrequest->RequestTimeline);
 
             DB::commit();
         } catch (\Exception $e) {
